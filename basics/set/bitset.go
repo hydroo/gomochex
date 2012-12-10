@@ -44,6 +44,24 @@ func (S BitSet) Copy() Copier {
 	return cp
 }
 
+func (S BitSet) IsEqual(e Element) bool {
+	T := e.(Set)
+
+	if S.Size() != T.Size() {
+		return false
+	}
+
+	for i := 0; i < S.Size(); i += 1 {
+		s, _ := S.At(i)
+
+		if T.Probe(s) != true {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (S BitSet) New() Newer {
 	return new(BitSet)
 }

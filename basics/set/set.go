@@ -14,6 +14,7 @@ type Newer interface {
 
 type Set interface {
 	Copier
+	Element
 	Newer
 	Add(e Element)
 	At(index int) (Element, bool)
@@ -75,6 +76,24 @@ func (S SimpleSet) Copy() Copier {
 	cp := make(SimpleSet, S.Size())
 	copy(cp, S)
 	return &cp
+}
+
+func (S SimpleSet) IsEqual(e Element) bool {
+	T := e.(Set)
+
+	if S.Size() != T.Size() {
+		return false
+	}
+
+	for i := 0; i < S.Size(); i += 1 {
+		s, _ := S.At(i)
+
+		if T.Probe(s) != true {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (S SimpleSet) New() Newer {

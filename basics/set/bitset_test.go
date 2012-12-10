@@ -40,6 +40,34 @@ func TestBetSetAddDuplicates(t *testing.T) {
 	}
 }
 
+func TestBitSetIsEqual(t *testing.T) {
+	S := set.NewBitSet()
+	S.Add(set.BitPosition(1))
+	S.Add(set.BitPosition(2))
+
+	T := set.NewBitSet()
+	T.Add(set.BitPosition(1))
+	T.Add(set.BitPosition(2))
+
+	if S.IsEqual(T) != true {
+		t.Error()
+	}
+}
+
+func TestBitSetIsUnequal(t *testing.T) {
+	S := set.NewBitSet()
+	S.Add(set.BitPosition(1))
+	S.Add(set.BitPosition(2))
+
+	T := set.NewBitSet()
+	T.Add(set.BitPosition(1))
+	T.Add(set.BitPosition(3))
+
+	if S.IsEqual(T) != false {
+		t.Error()
+	}
+}
+
 func TestBitSetRemove(t *testing.T) {
 	S := set.NewBitSet()
 	S.Add(set.BitPosition(0))

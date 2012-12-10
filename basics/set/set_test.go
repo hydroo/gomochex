@@ -48,6 +48,34 @@ func TestSetAddDuplicates(t *testing.T) {
 	}
 }
 
+func TestSetIsEqual(t *testing.T) {
+	S := set.NewSimpleSet()
+	S.Add(myInt(1))
+	S.Add(myInt(2))
+
+	T := set.NewSimpleSet()
+	T.Add(myInt(1))
+	T.Add(myInt(2))
+
+	if S.IsEqual(T) != true {
+		t.Error()
+	}
+}
+
+func TestSetIsUnequal(t *testing.T) {
+	S := set.NewSimpleSet()
+	S.Add(myInt(1))
+	S.Add(myInt(2))
+
+	T := set.NewSimpleSet()
+	T.Add(myInt(1))
+	T.Add(myInt(3))
+
+	if S.IsEqual(T) != false {
+		t.Error()
+	}
+}
+
 func TestSetRemove(t *testing.T) {
 	S := set.NewSimpleSet()
 	S.Add(myInt(1))
