@@ -12,66 +12,8 @@ func (i myInt) IsEqual(j set.Element) bool {
 	return i == j.(myInt)
 }
 
-type mySet []myInt
-
-func (S *mySet) Add(e set.Element) {
-
-	if S.Probe(e.(myInt)) == false {
-		*S = append(*S, e.(myInt))
-	}
-}
-
-func (S mySet) At(index int) (set.Element, bool) {
-	if index < len(S) {
-		return S[index], true
-	} //else {
-	return myInt(-1), false
-	//}
-}
-
-func (S mySet) Copy() set.Copier {
-	cp := make(mySet, S.Size())
-	copy(cp, S)
-	return &cp
-}
-
-func (S mySet) New() set.Newer {
-	return new(mySet)
-}
-
-func (S mySet) Probe(e set.Element) bool {
-	for _, v := range S {
-		if e.IsEqual(v) {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (S *mySet) Remove(e set.Element) {
-
-	if S.Probe(e) == false {
-		return
-	}
-
-	cp := new(mySet)
-
-	for _, v := range *S {
-		if e.IsEqual(v) == false {
-			cp.Add(v)
-		}
-	}
-
-	*S = *cp
-}
-
-func (S mySet) Size() int {
-	return len(S)
-}
-
 func TestSetInit(t *testing.T) {
-	S := new(mySet)
+	S := set.NewSimpleSet()
 
 	if S.Size() != 0 {
 		t.Error()
@@ -79,7 +21,7 @@ func TestSetInit(t *testing.T) {
 }
 
 func TestSetAdd(t *testing.T) {
-	S := new(mySet)
+	S := set.NewSimpleSet()
 	S.Add(myInt(1))
 	S.Add(myInt(2))
 	S.Add(myInt(3))
@@ -97,7 +39,7 @@ func TestSetAdd(t *testing.T) {
 }
 
 func TestSetAddDuplicates(t *testing.T) {
-	S := new(mySet)
+	S := set.NewSimpleSet()
 	S.Add(myInt(1))
 	S.Add(myInt(1))
 
@@ -107,7 +49,7 @@ func TestSetAddDuplicates(t *testing.T) {
 }
 
 func TestSetRemove(t *testing.T) {
-	S := new(mySet)
+	S := set.NewSimpleSet()
 	S.Add(myInt(1))
 	S.Add(myInt(2))
 	S.Add(myInt(3))
@@ -124,7 +66,7 @@ func TestSetRemove(t *testing.T) {
 }
 
 func TestSetRemoveFromEmpty(t *testing.T) {
-	S := new(mySet)
+	S := set.NewSimpleSet()
 
 	S.Remove(myInt(1))
 
@@ -135,12 +77,12 @@ func TestSetRemoveFromEmpty(t *testing.T) {
 
 func TestSetIntersect(t *testing.T) {
 
-	S := new(mySet)
+	S := set.NewSimpleSet()
 	S.Add(myInt(1))
 	S.Add(myInt(2))
 	S.Add(myInt(3))
 
-	T := new(mySet)
+	T := set.NewSimpleSet()
 	T.Add(myInt(2))
 	T.Add(myInt(3))
 	T.Add(myInt(4))
@@ -156,12 +98,12 @@ func TestSetIntersect(t *testing.T) {
 
 func TestSetJoin(t *testing.T) {
 
-	S := new(mySet)
+	S := set.NewSimpleSet()
 	S.Add(myInt(1))
 	S.Add(myInt(2))
 	S.Add(myInt(3))
 
-	T := new(mySet)
+	T := set.NewSimpleSet()
 	T.Add(myInt(2))
 	T.Add(myInt(3))
 	T.Add(myInt(4))

@@ -49,3 +49,66 @@ func Join(S, T Set) Set {
 
 	return ret
 }
+
+
+type SimpleSet []Element
+
+func NewSimpleSet() *SimpleSet {
+	return new(SimpleSet)
+}
+
+func (S *SimpleSet) Add(e Element) {
+	if S.Probe(e.(Element)) == false {
+		*S = append(*S, e.(Element))
+	}
+}
+
+func (S SimpleSet) At(index int) (Element, bool) {
+	if index < len(S) {
+		return S[index], true
+	} //else {
+	return S[0], false
+	//}
+}
+
+func (S SimpleSet) Copy() Copier {
+	cp := make(SimpleSet, S.Size())
+	copy(cp, S)
+	return &cp
+}
+
+func (S SimpleSet) New() Newer {
+	return new(SimpleSet)
+}
+
+func (S SimpleSet) Probe(e Element) bool {
+	for _, v := range S {
+		if e.IsEqual(v) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (S *SimpleSet) Remove(e Element) {
+
+	if S.Probe(e) == false {
+		return
+	}
+
+	cp := new(SimpleSet)
+
+	for _, v := range *S {
+		if e.IsEqual(v) == false {
+			cp.Add(v)
+		}
+	}
+
+	*S = *cp
+}
+
+func (S SimpleSet) Size() int {
+	return len(S)
+}
+
