@@ -15,14 +15,10 @@ func (i myInt) IsEqual(j set.Element) bool {
 
 func TestNewCartesianProduct(t *testing.T) {
 	S := set.NewSet()
-	S.Add(myInt(0))
-	S.Add(myInt(1))
-	S.Add(myInt(2))
+	S.Add(myInt(0), myInt(1), myInt(2))
 
 	U := set.NewSet()
-	U.Add(myInt(3))
-	U.Add(myInt(4))
-	U.Add(myInt(5))
+	U.Add(myInt(3), myInt(4), myInt(5))
 
 	SxU := cartesianproduct.NewCartesianProduct(S, U)
 
