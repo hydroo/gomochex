@@ -1,7 +1,7 @@
 package set
 
 import (
-//"fmt"
+	"fmt"
 )
 
 type BitPosition int
@@ -12,13 +12,20 @@ func (b BitPosition) IsEqual(e Element) bool {
 
 type BitSet []uint64
 
-func (S *BitSet) Add(e Element) {
-	b := int(e.(BitPosition))
-	if b >= len(*S)*64 {
-		S.resize(BitPosition(b))
-	}
+func NewBitSet() *BitSet {
+	return new(BitSet)
+}
 
-	(*S)[b/64] = (*S)[b/64] | (1 << uint(b%64))
+func (S *BitSet) Add(elements ...Element) {
+
+	for _, e := range elements {
+		b := int(e.(BitPosition))
+		if b >= len(*S)*64 {
+			S.resize(BitPosition(b))
+		}
+
+		(*S)[b/64] = (*S)[b/64] | (1 << uint(b%64))
+	}
 }
 
 func (S BitSet) At(index int) (Element, bool) {
@@ -74,14 +81,17 @@ func (S BitSet) Probe(e Element) bool {
 	return (S[b/64] & (1 << uint(b%64))) != 0
 }
 
-func (S *BitSet) Remove(e Element) {
-	b := int(e.(BitPosition))
+func (S *BitSet) Remove(elements ...Element) {
 
-	if b >= len(*S)*64 {
-		return
+	for _, e := range elements {
+		b := int(e.(BitPosition))
+
+		if b >= len(*S)*64 {
+			continue
+		}
+
+		(*S)[b/64] = (*S)[b/64] & ^(1 << uint(b%64))
 	}
-
-	(*S)[b/64] = (*S)[b/64] & ^(1 << uint(b%64))
 
 	for i := len(*S) - 1; i >= 0; i -= 1 {
 		if (*S)[i] != 0x0 {
@@ -122,6 +132,6 @@ func (S BitSet) Size() int {
 	return size
 }
 
-func NewBitSet() *BitSet {
-	return new(BitSet)
+func (S BitSet) String() string {
+	return fmt.Sprintf("%b", []uint64(S))
 }

@@ -24,15 +24,14 @@ func (t Tuple) Second() set.Element {
 }
 
 func NewTuple(first, second set.Element) *Tuple {
-	return &Tuple{first,second}
+	return &Tuple{first, second}
 }
-
 
 type CartesianProduct set.Set
 
 func NewCartesianProduct(S, T set.Set) set.Set {
 
-	SxT := set.NewSimpleSet()
+	SxT := set.NewSet()
 
 	for i := 0; i < S.Size(); i += 1 {
 		for j := 0; j < T.Size(); j += 1 {
@@ -44,4 +43,3 @@ func NewCartesianProduct(S, T set.Set) set.Set {
 
 	return SxT
 }
-

@@ -13,7 +13,7 @@ func (i myInt) IsEqual(j set.Element) bool {
 }
 
 func TestSetInit(t *testing.T) {
-	S := set.NewSimpleSet()
+	S := set.NewSet()
 
 	if S.Size() != 0 {
 		t.Error()
@@ -21,10 +21,8 @@ func TestSetInit(t *testing.T) {
 }
 
 func TestSetAdd(t *testing.T) {
-	S := set.NewSimpleSet()
-	S.Add(myInt(1))
-	S.Add(myInt(2))
-	S.Add(myInt(3))
+	S := set.NewSet()
+	S.Add(myInt(1), myInt(2), myInt(3))
 
 	if S.Size() != 3 {
 		t.Error()
@@ -39,9 +37,11 @@ func TestSetAdd(t *testing.T) {
 }
 
 func TestSetAddDuplicates(t *testing.T) {
-	S := set.NewSimpleSet()
+	S := set.NewSet()
 	S.Add(myInt(1))
 	S.Add(myInt(1))
+
+	S.Add(myInt(1), myInt(1))
 
 	if S.Size() != 1 {
 		t.Error()
@@ -49,13 +49,11 @@ func TestSetAddDuplicates(t *testing.T) {
 }
 
 func TestSetIsEqual(t *testing.T) {
-	S := set.NewSimpleSet()
-	S.Add(myInt(1))
-	S.Add(myInt(2))
+	S := set.NewSet()
+	S.Add(myInt(1), myInt(2))
 
-	T := set.NewSimpleSet()
-	T.Add(myInt(1))
-	T.Add(myInt(2))
+	T := set.NewSet()
+	T.Add(myInt(1), myInt(2))
 
 	if S.IsEqual(T) != true {
 		t.Error()
@@ -63,13 +61,11 @@ func TestSetIsEqual(t *testing.T) {
 }
 
 func TestSetIsUnequal(t *testing.T) {
-	S := set.NewSimpleSet()
-	S.Add(myInt(1))
-	S.Add(myInt(2))
+	S := set.NewSet()
+	S.Add(myInt(1), myInt(2))
 
-	T := set.NewSimpleSet()
-	T.Add(myInt(1))
-	T.Add(myInt(3))
+	T := set.NewSet()
+	T.Add(myInt(1), myInt(3))
 
 	if S.IsEqual(T) != false {
 		t.Error()
@@ -77,10 +73,8 @@ func TestSetIsUnequal(t *testing.T) {
 }
 
 func TestSetRemove(t *testing.T) {
-	S := set.NewSimpleSet()
-	S.Add(myInt(1))
-	S.Add(myInt(2))
-	S.Add(myInt(3))
+	S := set.NewSet()
+	S.Add(myInt(1), myInt(2), myInt(3))
 
 	S.Remove(myInt(2))
 
@@ -94,7 +88,7 @@ func TestSetRemove(t *testing.T) {
 }
 
 func TestSetRemoveFromEmpty(t *testing.T) {
-	S := set.NewSimpleSet()
+	S := set.NewSet()
 
 	S.Remove(myInt(1))
 
@@ -105,15 +99,11 @@ func TestSetRemoveFromEmpty(t *testing.T) {
 
 func TestSetIntersect(t *testing.T) {
 
-	S := set.NewSimpleSet()
-	S.Add(myInt(1))
-	S.Add(myInt(2))
-	S.Add(myInt(3))
+	S := set.NewSet()
+	S.Add(myInt(1), myInt(2), myInt(3))
 
-	T := set.NewSimpleSet()
-	T.Add(myInt(2))
-	T.Add(myInt(3))
-	T.Add(myInt(4))
+	T := set.NewSet()
+	T.Add(myInt(2), myInt(3), myInt(4))
 
 	U := set.Intersect(S, T)
 
@@ -126,15 +116,11 @@ func TestSetIntersect(t *testing.T) {
 
 func TestSetJoin(t *testing.T) {
 
-	S := set.NewSimpleSet()
-	S.Add(myInt(1))
-	S.Add(myInt(2))
-	S.Add(myInt(3))
+	S := set.NewSet()
+	S.Add(myInt(1), myInt(2), myInt(3))
 
-	T := set.NewSimpleSet()
-	T.Add(myInt(2))
-	T.Add(myInt(3))
-	T.Add(myInt(4))
+	T := set.NewSet()
+	T.Add(myInt(2), myInt(3), myInt(4))
 
 	U := set.Join(S, T)
 

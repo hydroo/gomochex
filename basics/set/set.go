@@ -1,25 +1,34 @@
 package set
 
-type Element interface {
-	IsEqual(e Element) bool
-}
+import (
+	"fmt"
+)
 
 type Copier interface {
 	Copy() Copier
+}
+
+type Element interface {
+	IsEqual(e Element) bool
 }
 
 type Newer interface {
 	New() Newer
 }
 
+type Stringer interface {
+	String() string
+}
+
 type Set interface {
 	Copier
 	Element
 	Newer
-	Add(e Element)
+	Stringer
+	Add(elements ...Element)
 	At(index int) (Element, bool)
 	Probe(e Element) bool
-	Remove(e Element)
+	Remove(elements ...Element)
 	Size() int
 }
 
@@ -51,20 +60,22 @@ func Join(S, T Set) Set {
 	return ret
 }
 
+type simpleSet []Element
 
-type SimpleSet []Element
-
-func NewSimpleSet() *SimpleSet {
-	return new(SimpleSet)
+func NewSet() Set {
+	return new(simpleSet)
 }
 
-func (S *SimpleSet) Add(e Element) {
-	if S.Probe(e.(Element)) == false {
-		*S = append(*S, e.(Element))
+func (S *simpleSet) Add(elements ...Element) {
+
+	for _, e := range elements {
+		if S.Probe(e) == false {
+			*S = append(*S, e)
+		}
 	}
 }
 
-func (S SimpleSet) At(index int) (Element, bool) {
+func (S simpleSet) At(index int) (Element, bool) {
 	if index < len(S) {
 		return S[index], true
 	} //else {
@@ -72,13 +83,13 @@ func (S SimpleSet) At(index int) (Element, bool) {
 	//}
 }
 
-func (S SimpleSet) Copy() Copier {
-	cp := make(SimpleSet, S.Size())
+func (S simpleSet) Copy() Copier {
+	cp := make(simpleSet, S.Size())
 	copy(cp, S)
 	return &cp
 }
 
-func (S SimpleSet) IsEqual(e Element) bool {
+func (S simpleSet) IsEqual(e Element) bool {
 	T := e.(Set)
 
 	if S.Size() != T.Size() {
@@ -96,11 +107,11 @@ func (S SimpleSet) IsEqual(e Element) bool {
 	return true
 }
 
-func (S SimpleSet) New() Newer {
-	return new(SimpleSet)
+func (S simpleSet) New() Newer {
+	return NewSet()
 }
 
-func (S SimpleSet) Probe(e Element) bool {
+func (S simpleSet) Probe(e Element) bool {
 	for _, v := range S {
 		if e.IsEqual(v) {
 			return true
@@ -110,24 +121,30 @@ func (S SimpleSet) Probe(e Element) bool {
 	return false
 }
 
-func (S *SimpleSet) Remove(e Element) {
+func (S *simpleSet) Remove(elements ...Element) {
 
-	if S.Probe(e) == false {
-		return
-	}
+	for _, e := range elements {
 
-	cp := new(SimpleSet)
-
-	for _, v := range *S {
-		if e.IsEqual(v) == false {
-			cp.Add(v)
+		if S.Probe(e) == false {
+			continue
 		}
-	}
 
-	*S = *cp
+		cp := NewSet().(*simpleSet)
+
+		for _, v := range *S {
+			if e.IsEqual(v) == false {
+				cp.Add(v)
+			}
+		}
+
+		*S = *cp
+	}
 }
 
-func (S SimpleSet) Size() int {
+func (S simpleSet) Size() int {
 	return len(S)
 }
 
+func (S simpleSet) String() string {
+	return fmt.Sprintf("%v", []Element(S))
+}

@@ -8,9 +8,7 @@ import (
 
 func TestBitSetAdd(t *testing.T) {
 	S := set.NewBitSet()
-	S.Add(set.BitPosition(1))
-	S.Add(set.BitPosition(5))
-	S.Add(set.BitPosition(129))
+	S.Add(set.BitPosition(1), set.BitPosition(5), set.BitPosition(129))
 
 	if S.Size() != 3 || len(*S) != 3 {
 		t.Error()
@@ -29,6 +27,8 @@ func TestBetSetAddDuplicates(t *testing.T) {
 	S.Add(set.BitPosition(1))
 	S.Add(set.BitPosition(1))
 
+	S.Add(set.BitPosition(1), set.BitPosition(1))
+
 	if S.Size() != 1 || len(*S) != 1 {
 		t.Error()
 	}
@@ -42,12 +42,10 @@ func TestBetSetAddDuplicates(t *testing.T) {
 
 func TestBitSetIsEqual(t *testing.T) {
 	S := set.NewBitSet()
-	S.Add(set.BitPosition(1))
-	S.Add(set.BitPosition(2))
+	S.Add(set.BitPosition(1), set.BitPosition(2))
 
 	T := set.NewBitSet()
-	T.Add(set.BitPosition(1))
-	T.Add(set.BitPosition(2))
+	T.Add(set.BitPosition(1), set.BitPosition(2))
 
 	if S.IsEqual(T) != true {
 		t.Error()
@@ -56,12 +54,10 @@ func TestBitSetIsEqual(t *testing.T) {
 
 func TestBitSetIsUnequal(t *testing.T) {
 	S := set.NewBitSet()
-	S.Add(set.BitPosition(1))
-	S.Add(set.BitPosition(2))
+	S.Add(set.BitPosition(1), set.BitPosition(2))
 
 	T := set.NewBitSet()
-	T.Add(set.BitPosition(1))
-	T.Add(set.BitPosition(3))
+	T.Add(set.BitPosition(1), set.BitPosition(3))
 
 	if S.IsEqual(T) != false {
 		t.Error()
@@ -70,9 +66,7 @@ func TestBitSetIsUnequal(t *testing.T) {
 
 func TestBitSetRemove(t *testing.T) {
 	S := set.NewBitSet()
-	S.Add(set.BitPosition(0))
-	S.Add(set.BitPosition(1))
-	S.Add(set.BitPosition(2))
+	S.Add(set.BitPosition(0), set.BitPosition(1), set.BitPosition(2))
 
 	S.Remove(set.BitPosition(1))
 
@@ -136,15 +130,11 @@ func TestBitSetResize(t *testing.T) {
 
 func TestBitSetIntersect(t *testing.T) {
 
-	S := new(set.BitSet)
-	S.Add(set.BitPosition(0))
-	S.Add(set.BitPosition(1))
-	S.Add(set.BitPosition(2))
+	S := set.NewBitSet()
+	S.Add(set.BitPosition(0), set.BitPosition(1), set.BitPosition(2))
 
-	T := new(set.BitSet)
-	T.Add(set.BitPosition(1))
-	T.Add(set.BitPosition(2))
-	T.Add(set.BitPosition(3))
+	T := set.NewBitSet()
+	T.Add(set.BitPosition(1), set.BitPosition(2), set.BitPosition(3))
 
 	U := set.Intersect(S, T)
 
@@ -157,15 +147,11 @@ func TestBitSetIntersect(t *testing.T) {
 
 func TestBitSetJoin(t *testing.T) {
 
-	S := new(set.BitSet)
-	S.Add(set.BitPosition(0))
-	S.Add(set.BitPosition(1))
-	S.Add(set.BitPosition(2))
+	S := set.NewBitSet()
+	S.Add(set.BitPosition(0), set.BitPosition(1), set.BitPosition(2))
 
-	T := new(set.BitSet)
-	T.Add(set.BitPosition(1))
-	T.Add(set.BitPosition(2))
-	T.Add(set.BitPosition(3))
+	T := set.NewBitSet()
+	T.Add(set.BitPosition(1), set.BitPosition(2), set.BitPosition(3))
 
 	U := set.Join(S, T)
 

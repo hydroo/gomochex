@@ -2,11 +2,10 @@ package cartesianproduct_test
 
 import (
 	//"fmt"
-	"testing"
-	"github.com/hydroo/gomochex/basics/set"
 	"github.com/hydroo/gomochex/basics/cartesianproduct"
+	"github.com/hydroo/gomochex/basics/set"
+	"testing"
 )
-
 
 type myInt int
 
@@ -14,14 +13,13 @@ func (i myInt) IsEqual(j set.Element) bool {
 	return i == j.(myInt)
 }
 
-
 func TestNewCartesianProduct(t *testing.T) {
-	S := set.NewSimpleSet()
+	S := set.NewSet()
 	S.Add(myInt(0))
 	S.Add(myInt(1))
 	S.Add(myInt(2))
-	
-	U := set.NewSimpleSet()
+
+	U := set.NewSet()
 	U.Add(myInt(3))
 	U.Add(myInt(4))
 	U.Add(myInt(5))
@@ -36,12 +34,11 @@ func TestNewCartesianProduct(t *testing.T) {
 		w, ok := SxU.At(i)
 		v := w.(cartesianproduct.Tuple)
 
-		s ,_ := S.At(i/3)
-		u ,_ := U.At(i%3)
+		s, _ := S.At(i / 3)
+		u, _ := U.At(i % 3)
 
 		if ok != true || v.First() != s || v.Second() != u {
 			t.Error()
 		}
 	}
 }
-
