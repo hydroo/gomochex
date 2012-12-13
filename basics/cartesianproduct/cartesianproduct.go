@@ -5,29 +5,36 @@ import (
 	"github.com/hydroo/gomochex/basics/set"
 )
 
-type Tuple struct {
+type Tuple interface {
+	set.Element
+	First() set.Element
+	Second() set.Element
+}
+
+type simpleTuple struct {
 	first, second set.Element
 }
 
-func (t Tuple) IsEqual(u set.Element) bool {
-	v := u.(Tuple)
-
-	return t.First().IsEqual(v.First()) && t.Second().IsEqual(v.Second())
+func (t simpleTuple) IsEqual(u set.Element) bool {
+	if v, ok := u.(Tuple); ok == true && t.First().IsEqual(v.First()) && t.Second().IsEqual(v.Second()) {
+		return true
+	} //else {
+	return false
+	//}
 }
 
-func (t Tuple) First() set.Element {
+func (t simpleTuple) First() set.Element {
 	return t.first
 }
 
-func (t Tuple) Second() set.Element {
+func (t simpleTuple) Second() set.Element {
 	return t.second
 }
 
-func NewTuple(first, second set.Element) *Tuple {
-	return &Tuple{first, second}
+func NewTuple(first, second set.Element) Tuple {
+	return &simpleTuple{first, second}
 }
 
-type CartesianProduct set.Set
 
 func NewCartesianProduct(S, T set.Set) set.Set {
 
@@ -37,9 +44,10 @@ func NewCartesianProduct(S, T set.Set) set.Set {
 		for j := 0; j < T.Size(); j += 1 {
 			s, _ := S.At(i)
 			t, _ := T.At(j)
-			SxT.Add(*NewTuple(s, t))
+			SxT.Add(NewTuple(s, t))
 		}
 	}
 
 	return SxT
 }
+

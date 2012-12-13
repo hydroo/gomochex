@@ -90,7 +90,11 @@ func (S simpleSet) Copy() Copier {
 }
 
 func (S simpleSet) IsEqual(e Element) bool {
-	T := e.(Set)
+	T, ok := e.(Set)
+
+	if ok == false {
+		return false
+	}
 
 	if S.Size() != T.Size() {
 		return false

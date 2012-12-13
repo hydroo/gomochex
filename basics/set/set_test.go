@@ -9,7 +9,12 @@ import (
 type myInt int
 
 func (i myInt) IsEqual(j set.Element) bool {
-	return i == j.(myInt)
+
+	if k, ok := j.(myInt); ok == true && i == k {
+		return true
+	} //else {
+	return false
+	//}
 }
 
 func TestSetInit(t *testing.T) {
@@ -67,7 +72,12 @@ func TestSetIsUnequal(t *testing.T) {
 	T := set.NewSet()
 	T.Add(myInt(1), myInt(3))
 
-	if S.IsEqual(T) != false {
+	U := set.NewSet()
+	U.Add(myInt(1))
+
+	V := myInt(1)
+
+	if S.IsEqual(T) != false || U.IsEqual(V) != false || V.IsEqual(U) != false {
 		t.Error()
 	}
 }

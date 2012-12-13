@@ -47,7 +47,7 @@ func TestBitSetIsEqual(t *testing.T) {
 	T := set.NewBitSet()
 	T.Add(set.BitPosition(1), set.BitPosition(2))
 
-	if S.IsEqual(T) != true {
+	if S.IsEqual(*T) != true {
 		t.Error()
 	}
 }
@@ -59,7 +59,13 @@ func TestBitSetIsUnequal(t *testing.T) {
 	T := set.NewBitSet()
 	T.Add(set.BitPosition(1), set.BitPosition(3))
 
-	if S.IsEqual(T) != false {
+
+	U := set.NewBitSet()
+	U.Add(set.BitPosition(1))
+
+	V := set.BitPosition(1)
+
+	if S.IsEqual(T) != false || U.IsEqual(V) != false || V.IsEqual(U) != false {
 		t.Error()
 	}
 }
@@ -128,38 +134,3 @@ func TestBitSetResize(t *testing.T) {
 
 }
 
-func TestBitSetIntersect(t *testing.T) {
-
-	S := set.NewBitSet()
-	S.Add(set.BitPosition(0), set.BitPosition(1), set.BitPosition(2))
-
-	T := set.NewBitSet()
-	T.Add(set.BitPosition(1), set.BitPosition(2), set.BitPosition(3))
-
-	U := set.Intersect(S, T)
-
-	u0, _ := U.At(0)
-	u1, _ := U.At(1)
-	if U.Size() != 2 || u0 != set.BitPosition(1) || u1 != set.BitPosition(2) {
-		t.Error()
-	}
-}
-
-func TestBitSetJoin(t *testing.T) {
-
-	S := set.NewBitSet()
-	S.Add(set.BitPosition(0), set.BitPosition(1), set.BitPosition(2))
-
-	T := set.NewBitSet()
-	T.Add(set.BitPosition(1), set.BitPosition(2), set.BitPosition(3))
-
-	U := set.Join(S, T)
-
-	u0, _ := U.At(0)
-	u1, _ := U.At(1)
-	u2, _ := U.At(2)
-	u3, _ := U.At(3)
-	if U.Size() != 4 || u0 != set.BitPosition(0) || u1 != set.BitPosition(1) || u2 != set.BitPosition(2) || u3 != set.BitPosition(3) {
-		t.Error()
-	}
-}

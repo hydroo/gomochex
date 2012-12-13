@@ -7,7 +7,11 @@ import (
 type BitPosition int
 
 func (b BitPosition) IsEqual(e Element) bool {
-	return b == e.(BitPosition)
+	if f, ok := e.(BitPosition); ok == true && b == f {
+		return true
+	} //else {
+	return false
+	//}
 }
 
 type BitSet []uint64
@@ -16,10 +20,10 @@ func NewBitSet() *BitSet {
 	return new(BitSet)
 }
 
-func (S *BitSet) Add(elements ...Element) {
+func (S *BitSet) Add(elements ...BitPosition) {
 
 	for _, e := range elements {
-		b := int(e.(BitPosition))
+		b := int(e)
 		if b >= len(*S)*64 {
 			S.resize(BitPosition(b))
 		}
@@ -28,7 +32,7 @@ func (S *BitSet) Add(elements ...Element) {
 	}
 }
 
-func (S BitSet) At(index int) (Element, bool) {
+func (S BitSet) At(index int) (BitPosition, bool) {
 
 	for i, v := range S {
 		for j, b := 0, uint64(1<<0); j < 64; j, b = j+1, b<<1 {
@@ -52,16 +56,18 @@ func (S BitSet) Copy() Copier {
 }
 
 func (S BitSet) IsEqual(e Element) bool {
-	T := e.(Set)
+	T, ok := e.(BitSet)
 
-	if S.Size() != T.Size() {
+	if ok == false {
 		return false
 	}
 
-	for i := 0; i < S.Size(); i += 1 {
-		s, _ := S.At(i)
+	if len(S) != len(T) {
+		return false
+	}
 
-		if T.Probe(s) != true {
+	for i := 0; i < len(S); i += 1 {
+		if S[i] != T[i] {
 			return false
 		}
 	}
@@ -70,21 +76,20 @@ func (S BitSet) IsEqual(e Element) bool {
 }
 
 func (S BitSet) New() Newer {
-	return new(BitSet)
+	return NewBitSet()
 }
 
-func (S BitSet) Probe(e Element) bool {
-	b := int(e.(BitPosition))
-	if b >= len(S)*64 {
+func (S BitSet) Probe(b BitPosition) bool {
+	if int(b) >= len(S)*64 {
 		return false
 	}
 	return (S[b/64] & (1 << uint(b%64))) != 0
 }
 
-func (S *BitSet) Remove(elements ...Element) {
+func (S *BitSet) Remove(elements ...BitPosition) {
 
 	for _, e := range elements {
-		b := int(e.(BitPosition))
+		b := int(e)
 
 		if b >= len(*S)*64 {
 			continue
