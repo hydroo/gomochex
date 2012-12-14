@@ -108,6 +108,8 @@ func (S *BitSet) Remove(elements ...BitPosition) {
 		}
 	}
 
+	S.resizeIfPossible()
+
 	// the bitset is completely empty
 	*S = *NewBitSet()
 }
@@ -121,6 +123,17 @@ func (S *BitSet) resize(b BitPosition) {
 		T[k] = v
 	}
 	*S = T
+}
+
+func (S *BitSet) resizeIfPossible() {
+	for i := len(*S) - 1; i >= 0; i -= 1 {
+		if (*S)[i] != 0x0 {
+			if i < len(*S)-1 {
+				S.resize(BitPosition(i * 64))
+			}
+			return
+		}
+	}
 }
 
 func (S BitSet) Size() int {
