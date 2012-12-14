@@ -63,7 +63,7 @@ func Join(S, T Set) Set {
 type simpleSet []Element
 
 func NewSet() Set {
-	return new(simpleSet)
+	return &simpleSet{}
 }
 
 func (S *simpleSet) Add(elements ...Element) {
