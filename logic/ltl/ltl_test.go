@@ -41,7 +41,7 @@ func TestFormulaFromString(t *testing.T) {
 	}
 
 	// wrong brackets 2
-	if _, ok := ltl.FormulaFromString("((b))∧a)"); ok != false {
+	if _, ok := ltl.FormulaFromString("((b))∨a)"); ok != false {
 		t.Error()
 	}
 
