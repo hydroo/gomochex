@@ -50,4 +50,3 @@ func TestFormulaFromString(t *testing.T) {
 		t.Error()
 	}
 }
-

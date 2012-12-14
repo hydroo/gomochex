@@ -15,7 +15,7 @@ type andFormula struct {
 }
 
 func (n andFormula) String() string {
-	return fmt.Sprint("(", n.phi, "∧" ,n.psi, ")")
+	return fmt.Sprint("(", n.phi, "∧", n.psi, ")")
 }
 
 // atomic proposition
@@ -40,7 +40,7 @@ type orFormula struct {
 }
 
 func (n orFormula) String() string {
-	return fmt.Sprint("(", n.phi, "∨" ,n.psi, ")")
+	return fmt.Sprint("(", n.phi, "∨", n.psi, ")")
 }
 
 func And(phi, psi Formula) Formula {
@@ -70,16 +70,16 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 	firstRune, firstRuneSize := utf8.DecodeRune([]byte(phi))
 
 	switch {
-	case len(phi) == 0 : // error
+	case len(phi) == 0: // error
 		return nil, false
-	case firstRune == '¬' : // not
+	case firstRune == '¬': // not
 		if len(phi)+1 <= firstRuneSize || phi[firstRuneSize] != '(' {
 			return nil, false
 		}
 
-		phi, ok := formulaFromStringRecursively(phi[3:len(phi)-1])
+		phi, ok := formulaFromStringRecursively(phi[3 : len(phi)-1])
 		return Not(phi), ok
-	case firstRune == '(' : // and / or
+	case firstRune == '(': // and / or
 		bracketCount := 0
 		for i := 1; i < len(phi); {
 			b, runeSize := utf8.DecodeRune([]byte(phi[i:]))
@@ -89,11 +89,11 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 				bracketCount -= 1
 			} else if bracketCount == 0 && b == '∧' { // and
 				subPhi, okPhi := formulaFromStringRecursively(phi[1:i])
-				subPsi, okPsi := formulaFromStringRecursively(phi[i+3:len(phi)-1])
+				subPsi, okPsi := formulaFromStringRecursively(phi[i+3 : len(phi)-1])
 				return And(subPhi, subPsi), okPhi && okPsi
 			} else if bracketCount == 0 && b == '∨' { // or
 				subPhi, okPhi := formulaFromStringRecursively(phi[1:i])
-				subPsi, okPsi := formulaFromStringRecursively(phi[i+3:len(phi)-1])
+				subPsi, okPsi := formulaFromStringRecursively(phi[i+3 : len(phi)-1])
 				return Or(subPhi, subPsi), okPhi && okPsi
 			} else if bracketCount == 0 && phi[i] == ')' {
 				return nil, false
@@ -103,7 +103,7 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 		}
 
 		return nil, false // too many opening brackets, or no ∧ was found
-	case firstRune != '¬' && firstRune != '(' : //ap
+	case firstRune != '¬' && firstRune != '(': //ap
 		for i := 0; i < len(phi); {
 			b, runeSize := utf8.DecodeRune([]byte(phi[i:]))
 			if b == '¬' || b == '(' || b == ')' || b == '∧' || b == '∨' {
@@ -117,4 +117,3 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 
 	return nil, false // error
 }
-

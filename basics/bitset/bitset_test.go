@@ -59,7 +59,6 @@ func TestIsUnequal(t *testing.T) {
 	T := bitset.NewBitSet()
 	T.Add(bitset.BitPosition(1), bitset.BitPosition(3))
 
-
 	U := bitset.NewBitSet()
 	U.Add(bitset.BitPosition(1))
 

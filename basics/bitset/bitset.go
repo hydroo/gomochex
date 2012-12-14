@@ -157,7 +157,7 @@ func Intersect(S, T BitSet) BitSet {
 		return U
 	}
 
-	U.resize(BitPosition((minLen*64)-1))
+	U.resize(BitPosition((minLen * 64) - 1))
 
 	for i := 0; i < minLen; i += 1 {
 		U[i] = S[i] & T[i]
@@ -186,7 +186,7 @@ func Join(S, T BitSet) BitSet {
 		return U
 	}
 
-	U.resize(BitPosition((maxLen*64)-1))
+	U.resize(BitPosition((maxLen * 64) - 1))
 
 	for i := 0; i < minLen; i += 1 {
 		U[i] = S[i] | T[i]
