@@ -49,13 +49,6 @@ func (S BitSet) At(index int) (BitPosition, bool) {
 	return BitPosition(-1), false
 }
 
-func (S BitSet) Copy() set.Copier {
-	cp := NewBitSet()
-	cp.resize(BitPosition((len(S) * 64) - 1))
-	copy(*cp, S)
-	return cp
-}
-
 func (S BitSet) IsEqual(e set.Element) bool {
 	T, ok := e.(BitSet)
 
@@ -74,10 +67,6 @@ func (S BitSet) IsEqual(e set.Element) bool {
 	}
 
 	return true
-}
-
-func (S BitSet) New() set.Newer {
-	return NewBitSet()
 }
 
 func (S BitSet) Probe(b BitPosition) bool {
