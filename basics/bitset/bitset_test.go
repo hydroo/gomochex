@@ -133,3 +133,40 @@ func TestBitSetResize(t *testing.T) {
 	}
 
 }
+
+func TestBitSetIntersect(t *testing.T) {
+
+	S := bitset.NewBitSet()
+	S.Add(bitset.BitPosition(1), bitset.BitPosition(2), bitset.BitPosition(3))
+
+	T := bitset.NewBitSet()
+	T.Add(bitset.BitPosition(2), bitset.BitPosition(3), bitset.BitPosition(64))
+
+	U := bitset.Intersect(S, T)
+
+	u0, _ := U.At(0)
+	u1, _ := U.At(1)
+	if U.Size() != 2 || u0 != bitset.BitPosition(2) || u1 != bitset.BitPosition(3) {
+		t.Error()
+	}
+}
+
+func TestBitSetJoin(t *testing.T) {
+
+	S := bitset.NewBitSet()
+	S.Add(bitset.BitPosition(1), bitset.BitPosition(2), bitset.BitPosition(3))
+
+	T := bitset.NewBitSet()
+	T.Add(bitset.BitPosition(2), bitset.BitPosition(3), bitset.BitPosition(64))
+
+	U := bitset.Join(S, T)
+
+	u0, _ := U.At(0)
+	u1, _ := U.At(1)
+	u2, _ := U.At(2)
+	u3, _ := U.At(3)
+
+	if U.Size() != 4 || u0 != bitset.BitPosition(1) || u1 != bitset.BitPosition(2) || u2 != bitset.BitPosition(3) || u3 != bitset.BitPosition(64) {
+		t.Error()
+	}
+}

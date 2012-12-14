@@ -143,3 +143,58 @@ func (S BitSet) Size() int {
 func (S BitSet) String() string {
 	return fmt.Sprintf("%b", []uint64(S))
 }
+
+func Intersect(S, T BitSet) BitSet {
+	U := NewBitSet()
+	minLen := 0
+	if len(S) > len(T) {
+		minLen = len(T)
+	} else {
+		minLen = len(S)
+	}
+
+	if minLen == 0 {
+		return U
+	}
+
+	U.resize(BitPosition((minLen*64)-1))
+
+	for i := 0; i < minLen; i += 1 {
+		U[i] = S[i] & T[i]
+	}
+
+	return U
+}
+
+func Join(S, T BitSet) BitSet {
+	U := NewBitSet()
+
+	maxLen := 0
+	minLen := 0
+	maxBitSet := S
+	if len(S) > len(T) {
+		maxLen = len(S)
+		maxBitSet = S
+		minLen = len(T)
+	} else {
+		maxLen = len(T)
+		maxBitSet = T
+		minLen = len(S)
+	}
+
+	if maxLen == 0 {
+		return U
+	}
+
+	U.resize(BitPosition((maxLen*64)-1))
+
+	for i := 0; i < minLen; i += 1 {
+		U[i] = S[i] | T[i]
+	}
+
+	for i := minLen; i < maxLen; i += 1 {
+		U[i] = maxBitSet[i]
+	}
+
+	return U
+}
