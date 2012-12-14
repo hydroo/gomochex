@@ -35,6 +35,14 @@ func (n notFormula) String() string {
 	return fmt.Sprint("¬(", n.phi, ")")
 }
 
+type orFormula struct {
+	phi, psi Formula
+}
+
+func (n orFormula) String() string {
+	return fmt.Sprint("(", n.phi, "∨" ,n.psi, ")")
+}
+
 func And(phi, psi Formula) Formula {
 	return andFormula{phi, psi}
 }
@@ -46,6 +54,10 @@ func AP(a string) Formula {
 
 func Not(phi Formula) Formula {
 	return notFormula{phi}
+}
+
+func Or(phi, psi Formula) Formula {
+	return orFormula{phi, psi}
 }
 
 func FormulaFromString(phi string) (Formula, bool) {
@@ -67,7 +79,7 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 
 		phi, ok := formulaFromStringRecursively(phi[3:len(phi)-1])
 		return Not(phi), ok
-	case firstRune == '(' : // and
+	case firstRune == '(' : // and / or
 		bracketCount := 0
 		for i := 1; i < len(phi); {
 			b, runeSize := utf8.DecodeRune([]byte(phi[i:]))
@@ -75,10 +87,14 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 				bracketCount += 1
 			} else if b == ')' {
 				bracketCount -= 1
-			} else if bracketCount == 0 && b == '∧' {
+			} else if bracketCount == 0 && b == '∧' { // and
 				subPhi, okPhi := formulaFromStringRecursively(phi[1:i])
 				subPsi, okPsi := formulaFromStringRecursively(phi[i+3:len(phi)-1])
 				return And(subPhi, subPsi), okPhi && okPsi
+			} else if bracketCount == 0 && b == '∨' { // or
+				subPhi, okPhi := formulaFromStringRecursively(phi[1:i])
+				subPsi, okPsi := formulaFromStringRecursively(phi[i+3:len(phi)-1])
+				return Or(subPhi, subPsi), okPhi && okPsi
 			} else if bracketCount == 0 && phi[i] == ')' {
 				return nil, false
 			}
@@ -90,7 +106,7 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 	case firstRune != '¬' && firstRune != '(' : //ap
 		for i := 0; i < len(phi); {
 			b, runeSize := utf8.DecodeRune([]byte(phi[i:]))
-			if b == '¬' || b == '(' || b == ')' || b == '∧' {
+			if b == '¬' || b == '(' || b == ')' || b == '∧' || b == '∨' {
 				return nil, false
 			}
 			i += runeSize

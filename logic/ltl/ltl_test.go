@@ -8,7 +8,7 @@ import (
 
 func TestCreateFormula(t *testing.T) {
 
-	if phi := ltl.Not(ltl.And(ltl.AP("π"), ltl.Not(ltl.AP("prΘp")))); fmt.Sprint(phi) != "¬((π∧¬(prΘp)))" {
+	if phi := ltl.Or(ltl.Not(ltl.And(ltl.AP("π"), ltl.Not(ltl.AP("prΘp")))), ltl.AP("a")); fmt.Sprint(phi) != "(¬((π∧¬(prΘp)))∨a)" {
 		t.Error()
 	}
 }
@@ -16,7 +16,7 @@ func TestCreateFormula(t *testing.T) {
 func TestFormulaFromString(t *testing.T) {
 
 	// correct formula
-	if phi, ok := ltl.FormulaFromString("¬((π∧¬ (prΘp))    )"); ok != true || fmt.Sprint(phi) != "¬((π∧¬(prΘp)))" {
+	if phi, ok := ltl.FormulaFromString("(¬((π∧¬ (prΘp))    )∨a)"); ok != true || fmt.Sprint(phi) != "(¬((π∧¬(prΘp)))∨a)" {
 		t.Error()
 	}
 
