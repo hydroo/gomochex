@@ -1,12 +1,13 @@
-package set
+package bitset
 
 import (
 	"fmt"
+	"github.com/hydroo/gomochex/basics/set"
 )
 
 type BitPosition int
 
-func (b BitPosition) IsEqual(e Element) bool {
+func (b BitPosition) IsEqual(e set.Element) bool {
 	if f, ok := e.(BitPosition); ok == true && b == f {
 		return true
 	} //else {
@@ -48,14 +49,14 @@ func (S BitSet) At(index int) (BitPosition, bool) {
 	return BitPosition(-1), false
 }
 
-func (S BitSet) Copy() Copier {
+func (S BitSet) Copy() set.Copier {
 	cp := NewBitSet()
 	cp.resize(BitPosition((len(S) * 64) - 1))
 	copy(*cp, S)
 	return cp
 }
 
-func (S BitSet) IsEqual(e Element) bool {
+func (S BitSet) IsEqual(e set.Element) bool {
 	T, ok := e.(BitSet)
 
 	if ok == false {
@@ -75,7 +76,7 @@ func (S BitSet) IsEqual(e Element) bool {
 	return true
 }
 
-func (S BitSet) New() Newer {
+func (S BitSet) New() set.Newer {
 	return NewBitSet()
 }
 
