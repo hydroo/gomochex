@@ -10,6 +10,14 @@ type Formula interface {
 	String() string
 }
 
+type andFormula struct {
+	phi, psi Formula
+}
+
+func (n andFormula) String() string {
+	return fmt.Sprint("(", n.phi, "∧" ,n.psi, ")")
+}
+
 // atomic proposition
 type aPFormula struct {
 	a string
@@ -27,12 +35,8 @@ func (n notFormula) String() string {
 	return fmt.Sprint("¬(", n.phi, ")")
 }
 
-type andFormula struct {
-	phi, psi Formula
-}
-
-func (n andFormula) String() string {
-	return fmt.Sprint("(", n.phi, "∧" ,n.psi, ")")
+func And(phi, psi Formula) Formula {
+	return andFormula{phi, psi}
 }
 
 // atomic proposition
@@ -42,10 +46,6 @@ func AP(a string) Formula {
 
 func Not(phi Formula) Formula {
 	return notFormula{phi}
-}
-
-func And(phi, psi Formula) Formula {
-	return andFormula{phi, psi}
 }
 
 func FormulaFromString(phi string) (Formula, bool) {
