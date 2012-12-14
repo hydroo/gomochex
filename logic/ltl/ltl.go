@@ -102,7 +102,7 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 			i += runeSize
 		}
 
-		return nil, false // too many opening brackets, or no ∧ was found
+		return nil, false // too many opening brackets, or no ∧,∨ was found
 	case firstRune != '¬' && firstRune != '(': //ap
 		for i := 0; i < len(phi); {
 			b, runeSize := utf8.DecodeRune([]byte(phi[i:]))
