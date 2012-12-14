@@ -17,7 +17,7 @@ func (i myInt) IsEqual(j set.Element) bool {
 	//}
 }
 
-func TestSetInit(t *testing.T) {
+func TestInit(t *testing.T) {
 	S := set.NewSet()
 
 	if S.Size() != 0 {
@@ -25,7 +25,7 @@ func TestSetInit(t *testing.T) {
 	}
 }
 
-func TestSetAdd(t *testing.T) {
+func TestAdd(t *testing.T) {
 	S := set.NewSet()
 	S.Add(myInt(1), myInt(2), myInt(3))
 
@@ -41,7 +41,7 @@ func TestSetAdd(t *testing.T) {
 	}
 }
 
-func TestSetAddDuplicates(t *testing.T) {
+func TestAddDuplicates(t *testing.T) {
 	S := set.NewSet()
 	S.Add(myInt(1))
 	S.Add(myInt(1))
@@ -53,7 +53,7 @@ func TestSetAddDuplicates(t *testing.T) {
 	}
 }
 
-func TestSetIsEqual(t *testing.T) {
+func TestIsEqual(t *testing.T) {
 	S := set.NewSet()
 	S.Add(myInt(1), myInt(2))
 
@@ -65,7 +65,7 @@ func TestSetIsEqual(t *testing.T) {
 	}
 }
 
-func TestSetIsUnequal(t *testing.T) {
+func TestIsUnequal(t *testing.T) {
 	S := set.NewSet()
 	S.Add(myInt(1), myInt(2))
 
@@ -82,7 +82,7 @@ func TestSetIsUnequal(t *testing.T) {
 	}
 }
 
-func TestSetRemove(t *testing.T) {
+func TestRemove(t *testing.T) {
 	S := set.NewSet()
 	S.Add(myInt(1), myInt(2), myInt(3))
 
@@ -97,7 +97,7 @@ func TestSetRemove(t *testing.T) {
 	}
 }
 
-func TestSetRemoveFromEmpty(t *testing.T) {
+func TestRemoveFromEmpty(t *testing.T) {
 	S := set.NewSet()
 
 	S.Remove(myInt(1))
@@ -107,7 +107,7 @@ func TestSetRemoveFromEmpty(t *testing.T) {
 	}
 }
 
-func TestSetIntersect(t *testing.T) {
+func TestIntersect(t *testing.T) {
 
 	S := set.NewSet()
 	S.Add(myInt(1), myInt(2), myInt(3))
@@ -124,7 +124,7 @@ func TestSetIntersect(t *testing.T) {
 	}
 }
 
-func TestSetJoin(t *testing.T) {
+func TestJoin(t *testing.T) {
 
 	S := set.NewSet()
 	S.Add(myInt(1), myInt(2), myInt(3))

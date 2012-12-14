@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestBitSetAdd(t *testing.T) {
+func TestAdd(t *testing.T) {
 	S := bitset.NewBitSet()
 	S.Add(bitset.BitPosition(1), bitset.BitPosition(5), bitset.BitPosition(129))
 
@@ -40,7 +40,7 @@ func TestBetSetAddDuplicates(t *testing.T) {
 	}
 }
 
-func TestBitSetIsEqual(t *testing.T) {
+func TestIsEqual(t *testing.T) {
 	S := bitset.NewBitSet()
 	S.Add(bitset.BitPosition(1), bitset.BitPosition(2))
 
@@ -52,7 +52,7 @@ func TestBitSetIsEqual(t *testing.T) {
 	}
 }
 
-func TestBitSetIsUnequal(t *testing.T) {
+func TestIsUnequal(t *testing.T) {
 	S := bitset.NewBitSet()
 	S.Add(bitset.BitPosition(1), bitset.BitPosition(2))
 
@@ -70,7 +70,7 @@ func TestBitSetIsUnequal(t *testing.T) {
 	}
 }
 
-func TestBitSetRemove(t *testing.T) {
+func TestRemove(t *testing.T) {
 	S := bitset.NewBitSet()
 	S.Add(bitset.BitPosition(0), bitset.BitPosition(1), bitset.BitPosition(2))
 
@@ -85,7 +85,7 @@ func TestBitSetRemove(t *testing.T) {
 	}
 }
 
-func TestBitSetRemoveFromEmpty(t *testing.T) {
+func TestRemoveFromEmpty(t *testing.T) {
 	S := bitset.NewBitSet()
 
 	S.Remove(bitset.BitPosition(1))
@@ -95,7 +95,7 @@ func TestBitSetRemoveFromEmpty(t *testing.T) {
 	}
 }
 
-func TestBitSetResize(t *testing.T) {
+func TestResize(t *testing.T) {
 	S := bitset.NewBitSet()
 
 	if S.Size() != 0 || len(S) != 0 {
@@ -134,7 +134,7 @@ func TestBitSetResize(t *testing.T) {
 
 }
 
-func TestBitSetIntersect(t *testing.T) {
+func TestIntersect(t *testing.T) {
 
 	S := bitset.NewBitSet()
 	S.Add(bitset.BitPosition(1), bitset.BitPosition(2), bitset.BitPosition(3))
@@ -151,7 +151,7 @@ func TestBitSetIntersect(t *testing.T) {
 	}
 }
 
-func TestBitSetJoin(t *testing.T) {
+func TestJoin(t *testing.T) {
 
 	S := bitset.NewBitSet()
 	S.Add(bitset.BitPosition(1), bitset.BitPosition(2), bitset.BitPosition(3))
