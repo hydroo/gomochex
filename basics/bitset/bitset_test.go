@@ -10,7 +10,7 @@ func TestBitSetAdd(t *testing.T) {
 	S := bitset.NewBitSet()
 	S.Add(bitset.BitPosition(1), bitset.BitPosition(5), bitset.BitPosition(129))
 
-	if S.Size() != 3 || len(*S) != 3 {
+	if S.Size() != 3 || len(S) != 3 {
 		t.Error()
 	}
 
@@ -29,7 +29,7 @@ func TestBetSetAddDuplicates(t *testing.T) {
 
 	S.Add(bitset.BitPosition(1), bitset.BitPosition(1))
 
-	if S.Size() != 1 || len(*S) != 1 {
+	if S.Size() != 1 || len(S) != 1 {
 		t.Error()
 	}
 
@@ -47,7 +47,7 @@ func TestBitSetIsEqual(t *testing.T) {
 	T := bitset.NewBitSet()
 	T.Add(bitset.BitPosition(1), bitset.BitPosition(2))
 
-	if S.IsEqual(*T) != true {
+	if S.IsEqual(T) != true {
 		t.Error()
 	}
 }
@@ -76,7 +76,7 @@ func TestBitSetRemove(t *testing.T) {
 
 	S.Remove(bitset.BitPosition(1))
 
-	if S.Size() != 2 || len(*S) != 1 {
+	if S.Size() != 2 || len(S) != 1 {
 		t.Error()
 	}
 
@@ -90,7 +90,7 @@ func TestBitSetRemoveFromEmpty(t *testing.T) {
 
 	S.Remove(bitset.BitPosition(1))
 
-	if S.Size() != 0 || len(*S) != 0 {
+	if S.Size() != 0 || len(S) != 0 {
 		t.Error()
 	}
 }
@@ -98,37 +98,37 @@ func TestBitSetRemoveFromEmpty(t *testing.T) {
 func TestBitSetResize(t *testing.T) {
 	S := bitset.NewBitSet()
 
-	if S.Size() != 0 || len(*S) != 0 {
+	if S.Size() != 0 || len(S) != 0 {
 		t.Error()
 	}
 
 	S.Add(bitset.BitPosition(0))
-	if S.Size() != 1 || len(*S) != 1 {
+	if S.Size() != 1 || len(S) != 1 {
 		t.Error()
 	}
 
 	S.Add(bitset.BitPosition(63))
-	if S.Size() != 2 || len(*S) != 1 {
+	if S.Size() != 2 || len(S) != 1 {
 		t.Error()
 	}
 
 	S.Add(bitset.BitPosition(64))
-	if S.Size() != 3 || len(*S) != 2 {
+	if S.Size() != 3 || len(S) != 2 {
 		t.Error()
 	}
 
 	S.Remove(bitset.BitPosition(63))
-	if S.Size() != 2 || len(*S) != 2 {
+	if S.Size() != 2 || len(S) != 2 {
 		t.Error()
 	}
 
 	S.Remove(bitset.BitPosition(64))
-	if S.Size() != 1 || len(*S) != 1 {
+	if S.Size() != 1 || len(S) != 1 {
 		t.Error()
 	}
 
 	S.Remove(bitset.BitPosition(0))
-	if S.Size() != 0 || len(*S) != 0 {
+	if S.Size() != 0 || len(S) != 0 {
 		t.Error()
 	}
 

@@ -17,8 +17,8 @@ func (b BitPosition) IsEqual(e set.Element) bool {
 
 type BitSet []uint64
 
-func NewBitSet() *BitSet {
-	return &BitSet{}
+func NewBitSet() BitSet {
+	return make(BitSet, 0)
 }
 
 func (S *BitSet) Add(elements ...BitPosition) {
@@ -100,7 +100,7 @@ func (S *BitSet) Remove(elements ...BitPosition) {
 	S.resizeIfPossible()
 
 	// the bitset is completely empty
-	*S = *NewBitSet()
+	*S = NewBitSet()
 }
 
 func (S *BitSet) resize(b BitPosition) {
