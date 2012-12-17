@@ -16,15 +16,11 @@ type Newer interface {
 	New() Newer
 }
 
-type Stringer interface {
-	String() string
-}
-
 type Set interface {
 	Copier
 	Element
 	Newer
-	Stringer
+	String() string
 	Add(elements ...Element)
 	At(index int) (Element, bool)
 	Probe(e Element) bool
