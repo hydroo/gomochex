@@ -2,7 +2,7 @@ package bitset
 
 import (
 	"fmt"
-	"github.com/hydroo/gomochex/basics/set"
+	"github.com/hydroo/gomochex/basic/set"
 )
 
 type BitPosition int

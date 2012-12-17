@@ -2,7 +2,7 @@ package set_test
 
 import (
 	//"fmt"
-	"github.com/hydroo/gomochex/basics/set"
+	"github.com/hydroo/gomochex/basic/set"
 	"testing"
 )
 

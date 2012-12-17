@@ -2,7 +2,7 @@ package bitset_test
 
 import (
 	//"fmt"
-	"github.com/hydroo/gomochex/basics/bitset"
+	"github.com/hydroo/gomochex/basic/bitset"
 	"testing"
 )
 
