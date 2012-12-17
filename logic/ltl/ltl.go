@@ -10,6 +10,16 @@ type Formula interface {
 	String() string
 }
 
+/*****************************************************************************/
+
+type alwaysFormula struct {
+	phi Formula
+}
+
+func (n alwaysFormula) String() string {
+	return fmt.Sprint("□(", n.phi, ")")
+}
+
 type andFormula struct {
 	phi, psi Formula
 }
@@ -25,6 +35,29 @@ type aPFormula struct {
 
 func (n aPFormula) String() string {
 	return n.a
+}
+
+type eventuallyFormula struct {
+	phi Formula
+}
+
+func (n eventuallyFormula) String() string {
+	return fmt.Sprint("◇(", n.phi, ")")
+}
+
+type falseFormula struct {
+}
+
+func (n falseFormula) String() string {
+	return "false"
+}
+
+type nextFormula struct {
+	phi Formula
+}
+
+func (n nextFormula) String() string {
+	return fmt.Sprint("○(", n.phi, ")")
 }
 
 type notFormula struct {
@@ -43,6 +76,27 @@ func (n orFormula) String() string {
 	return fmt.Sprint("(", n.phi, "∨", n.psi, ")")
 }
 
+type trueFormula struct {
+}
+
+func (n trueFormula) String() string {
+	return "true"
+}
+
+type untilFormula struct {
+	phi, psi Formula
+}
+
+func (n untilFormula) String() string {
+	return fmt.Sprint("((", n.phi, ")U(", n.psi, "))")
+}
+
+/*****************************************************************************/
+
+func Always(phi Formula) Formula {
+	return alwaysFormula{phi}
+}
+
 func And(phi, psi Formula) Formula {
 	return andFormula{phi, psi}
 }
@@ -52,6 +106,18 @@ func AP(a string) Formula {
 	return aPFormula{a}
 }
 
+func Eventually(phi Formula) Formula {
+	return eventuallyFormula{phi}
+}
+
+func False() Formula {
+	return falseFormula{}
+}
+
+func Next(phi Formula) Formula {
+	return nextFormula{phi}
+}
+
 func Not(phi Formula) Formula {
 	return notFormula{phi}
 }
@@ -59,6 +125,16 @@ func Not(phi Formula) Formula {
 func Or(phi, psi Formula) Formula {
 	return orFormula{phi, psi}
 }
+
+func True() Formula {
+	return trueFormula{}
+}
+
+func Until(phi, psi Formula) Formula {
+	return untilFormula{phi, psi}
+}
+
+/*****************************************************************************/
 
 func FormulaFromString(phi string) (Formula, bool) {
 	phi = strings.Replace(phi, " ", "", -1)
@@ -72,14 +148,26 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 	switch {
 	case len(phi) == 0: // error
 		return nil, false
-	case firstRune == '¬': // not
+
+	case firstRune == '□', firstRune == '◇', firstRune == '○', firstRune == '¬' :
 		if len(phi)+1 <= firstRuneSize || phi[firstRuneSize] != '(' {
 			return nil, false
 		}
 
-		phi, ok := formulaFromStringRecursively(phi[3 : len(phi)-1])
-		return Not(phi), ok
-	case firstRune == '(': // and / or
+		phi, ok := formulaFromStringRecursively(phi[firstRuneSize+1 : len(phi)-1])
+
+		switch firstRune {
+		case '□' :
+			return Always(phi), ok
+		case '◇' :
+			return Eventually(phi), ok
+		case '○' :
+			return Next(phi), ok
+		case '¬' :
+			return Not(phi), ok
+		}
+
+	case firstRune == '(': // and / or / until
 		bracketCount := 0
 		for i := 1; i < len(phi); {
 			b, runeSize := utf8.DecodeRune([]byte(phi[i:]))
@@ -87,14 +175,18 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 				bracketCount += 1
 			} else if b == ')' {
 				bracketCount -= 1
-			} else if bracketCount == 0 && b == '∧' { // and
+			} else if bracketCount == 0 && (b == '∧' || b == '∨') {
 				subPhi, okPhi := formulaFromStringRecursively(phi[1:i])
-				subPsi, okPsi := formulaFromStringRecursively(phi[i+3 : len(phi)-1])
-				return And(subPhi, subPsi), okPhi && okPsi
-			} else if bracketCount == 0 && b == '∨' { // or
-				subPhi, okPhi := formulaFromStringRecursively(phi[1:i])
-				subPsi, okPsi := formulaFromStringRecursively(phi[i+3 : len(phi)-1])
-				return Or(subPhi, subPsi), okPhi && okPsi
+				subPsi, okPsi := formulaFromStringRecursively(phi[i+runeSize : len(phi)-1])
+				if b == '∧' {
+					return And(subPhi, subPsi), okPhi && okPsi
+				} else { // '∨'
+					return Or(subPhi, subPsi), okPhi && okPsi
+				}
+			} else if bracketCount == 0 && b == 'U' { // until
+				subPhi, okPhi := formulaFromStringRecursively(phi[2:i-1])
+				subPsi, okPsi := formulaFromStringRecursively(phi[i+2 : len(phi)-2])
+				return Until(subPhi, subPsi), okPhi && okPsi
 			} else if bracketCount == 0 && phi[i] == ')' {
 				return nil, false
 			}
@@ -103,7 +195,7 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 		}
 
 		return nil, false // too many opening brackets, or no ∧,∨ was found
-	case firstRune != '¬' && firstRune != '(': //ap
+	case firstRune != '¬' && firstRune != '(': // false, true, ap
 		for i := 0; i < len(phi); {
 			b, runeSize := utf8.DecodeRune([]byte(phi[i:]))
 			if b == '¬' || b == '(' || b == ')' || b == '∧' || b == '∨' {
@@ -112,7 +204,13 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 			i += runeSize
 		}
 
-		return AP(phi), true
+		if phi == "false" {
+			return False(), true
+		} else if phi == "true" {
+			return True(), true
+		} else {
+			return AP(phi), true
+		}
 	}
 
 	return nil, false // error

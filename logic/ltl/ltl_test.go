@@ -49,4 +49,53 @@ func TestFormulaFromString(t *testing.T) {
 	if _, ok := ltl.FormulaFromString("((b∧a)"); ok != false {
 		t.Error()
 	}
+
+	// correct false
+	if phi, ok := ltl.FormulaFromString("(¬(¬(false))∨false)"); ok != true || fmt.Sprint(phi) != "(¬(¬(false))∨false)" {
+		t.Error()
+	}
+
+	// wrong false
+	if phi, ok := ltl.FormulaFromString("(¬((falsefalse∧¬ (false))    )∨false)"); ok != true || fmt.Sprint(phi) != "(¬((falsefalse∧¬(false)))∨false)" {
+		t.Error()
+	}
+
+	// correct true
+	if phi, ok := ltl.FormulaFromString("(¬(¬(true))∨true)"); ok != true || fmt.Sprint(phi) != "(¬(¬(true))∨true)" {
+		t.Error()
+	}
+
+	// wrong true
+	if phi, ok := ltl.FormulaFromString("(¬((truetrue∧¬ (true))    )∨true)"); ok != true || fmt.Sprint(phi) != "(¬((truetrue∧¬(true)))∨true)" {
+		t.Error()
+	}
+
+	// correct next
+	if phi, ok := ltl.FormulaFromString("○(false)"); ok != true || fmt.Sprint(phi) != "○(false)" {
+		fmt.Println(phi)
+		t.Error()
+	}
+
+	// wrong next
+	if _, ok := ltl.FormulaFromString("○false"); ok != false {
+		t.Error()
+	}
+
+	// correct eventually
+	if phi, ok := ltl.FormulaFromString("◇(false)"); ok != true || fmt.Sprint(phi) != "◇(false)" {
+		fmt.Println(phi)
+		t.Error()
+	}
+
+	// wrong eventually
+	if _, ok := ltl.FormulaFromString("◇false"); ok != false {
+		t.Error()
+	}
+
+	// correct until
+	if phi, ok := ltl.FormulaFromString("((a)U(((b)U(false))))"); ok != true || fmt.Sprint(phi) != "((a)U(((b)U(false))))" {
+		fmt.Println(phi)
+		t.Error()
+	}
+
 }
