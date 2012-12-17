@@ -149,7 +149,7 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 	case len(phi) == 0: // error
 		return nil, false
 
-	case firstRune == '□', firstRune == '◇', firstRune == '○', firstRune == '¬' :
+	case firstRune == '□', firstRune == '◇', firstRune == '○', firstRune == '¬':
 		if len(phi)+1 <= firstRuneSize || phi[firstRuneSize] != '(' {
 			return nil, false
 		}
@@ -157,13 +157,13 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 		phi, ok := formulaFromStringRecursively(phi[firstRuneSize+1 : len(phi)-1])
 
 		switch firstRune {
-		case '□' :
+		case '□':
 			return Always(phi), ok
-		case '◇' :
+		case '◇':
 			return Eventually(phi), ok
-		case '○' :
+		case '○':
 			return Next(phi), ok
-		case '¬' :
+		case '¬':
 			return Not(phi), ok
 		}
 
@@ -184,7 +184,7 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 					return Or(subPhi, subPsi), okPhi && okPsi
 				}
 			} else if bracketCount == 0 && b == 'U' { // until
-				subPhi, okPhi := formulaFromStringRecursively(phi[2:i-1])
+				subPhi, okPhi := formulaFromStringRecursively(phi[2 : i-1])
 				subPsi, okPsi := formulaFromStringRecursively(phi[i+2 : len(phi)-2])
 				return Until(subPhi, subPsi), okPhi && okPsi
 			} else if bracketCount == 0 && phi[i] == ')' {
