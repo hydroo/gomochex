@@ -15,16 +15,15 @@ type Expression interface {
 
 /*****************************************************************************/
 
-type con struct {
+type concat struct {
 	l, r Expression
 }
 
-func (e con) String() string {
+func (e concat) String() string {
 	return fmt.Sprint("(", e.l, ".", e.r, ")")
 }
 
-func (e con) Nfa() nfa.Nfa {
-
+func (e concat) Nfa() nfa.Nfa {
 	//TODO
 	ret := nfa.NewNfa()
 	return ret
@@ -72,7 +71,6 @@ func (e or) String() string {
 }
 
 func (e or) Nfa() nfa.Nfa {
-
 	//TODO
 	ret := nfa.NewNfa()
 	return ret
@@ -87,7 +85,6 @@ func (e star) String() string {
 }
 
 func (e star) Nfa() nfa.Nfa {
-
 	//TODO
 	ret := nfa.NewNfa()
 	return ret
@@ -95,8 +92,8 @@ func (e star) Nfa() nfa.Nfa {
 
 /*****************************************************************************/
 
-func Con(l, r Expression) Expression {
-	return &con{l, r}
+func Concat(l, r Expression) Expression {
+	return &concat{l, r}
 }
 
 func Letter(l string) Expression {
@@ -133,7 +130,7 @@ func expressionFromStringRecursively(s string) (Expression, bool) {
 				subL, okL := expressionFromStringRecursively(s[1:i])
 				subR, okR := expressionFromStringRecursively(s[i+runeSize : len(s)-1])
 				if r == '.' {
-					return Con(subL, subR), okL && okR
+					return Concat(subL, subR), okL && okR
 				} else { // '+'
 					return Or(subL, subR), okL && okR
 				}

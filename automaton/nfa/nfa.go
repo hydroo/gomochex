@@ -34,14 +34,11 @@ type Nfa interface {
 
 	Transition(State, Letter) StateSet
 	SetTransitionFunction(func(State, Letter) StateSet)
+	//maybe TODO SetTransitionTable(table of state - letter - state)
 }
 
 func NewNfa() Nfa {
-	return &simpleNfa{set.NewSet(),
-		set.NewSet(),
-		set.NewSet(),
-		func(State, Letter) StateSet { return set.NewSet() },
-		set.NewSet()}
+	return &simpleNfa{set.NewSet(), set.NewSet(), set.NewSet(), func(State, Letter) StateSet { return set.NewSet() }, set.NewSet()}
 }
 
 /*****************************************************************************/

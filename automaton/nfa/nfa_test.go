@@ -46,14 +46,7 @@ func TestSimpleNfa(t *testing.T) {
 		t.Error()
 	}
 
-	trans12 := set.NewSet()
-	trans12.Add(s2)
-	trans23 := set.NewSet()
-	trans23.Add(s3)
-	trans31 := set.NewSet()
-	trans31.Add(s1)
-
-	if A.Transition(s1, a).IsEqual(trans12) != true || A.Transition(s2, b).IsEqual(trans23) != true || A.Transition(s3, a).IsEqual(trans31) != true || A.Transition(s1, b).IsEqual(set.NewSet()) != true {
+	if A.Transition(s1, a).IsEqual(set.NewSet(s2)) != true || A.Transition(s2, b).IsEqual(set.NewSet(s3)) != true || A.Transition(s3, a).IsEqual(set.NewSet(s1)) != true || A.Transition(s1, b).IsEqual(set.NewSet()) != true {
 		t.Error()
 	}
 }

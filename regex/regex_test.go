@@ -56,7 +56,7 @@ func TestExpressionFromString(t *testing.T) {
 
 }
 
-func TestConNfa(t *testing.T) {
+func TestConcatNfa(t *testing.T) {
 	//TODO
 }
 
