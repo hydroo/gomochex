@@ -17,8 +17,10 @@ func (b BitPosition) IsEqual(e set.Element) bool {
 
 type BitSet []uint64
 
-func NewBitSet() BitSet {
-	return make(BitSet, 0)
+func NewBitSet(bits ...BitPosition) BitSet {
+	ret := make(BitSet, 0)
+	ret.Add(bits)
+	return ret
 }
 
 func (S *BitSet) Add(elements ...BitPosition) {

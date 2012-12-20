@@ -58,8 +58,12 @@ func Join(S, T Set) Set {
 
 type simpleSet []Element
 
-func NewSet() Set {
-	return &simpleSet{}
+func NewSet(elements ...Element) Set {
+	ret := &simpleSet{}
+	for _, e := range elements {
+		ret.Add(e)
+	}
+	return ret
 }
 
 func (S *simpleSet) Add(elements ...Element) {

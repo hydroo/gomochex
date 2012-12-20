@@ -41,11 +41,8 @@ func TestBetSetAddDuplicates(t *testing.T) {
 }
 
 func TestIsEqual(t *testing.T) {
-	S := bitset.NewBitSet()
-	S.Add(bitset.BitPosition(1), bitset.BitPosition(2))
-
-	T := bitset.NewBitSet()
-	T.Add(bitset.BitPosition(1), bitset.BitPosition(2))
+	S := bitset.NewBitSet(bitset.BitPosition(1), bitset.BitPosition(2))
+	T := bitset.NewBitSet(bitset.BitPosition(1), bitset.BitPosition(2))
 
 	if S.IsEqual(T) != true {
 		t.Error()
@@ -53,15 +50,9 @@ func TestIsEqual(t *testing.T) {
 }
 
 func TestIsUnequal(t *testing.T) {
-	S := bitset.NewBitSet()
-	S.Add(bitset.BitPosition(1), bitset.BitPosition(2))
-
-	T := bitset.NewBitSet()
-	T.Add(bitset.BitPosition(1), bitset.BitPosition(3))
-
-	U := bitset.NewBitSet()
-	U.Add(bitset.BitPosition(1))
-
+	S := bitset.NewBitSet(bitset.BitPosition(1), bitset.BitPosition(2))
+	T := bitset.NewBitSet(bitset.BitPosition(1), bitset.BitPosition(3))
+	U := bitset.NewBitSet(bitset.BitPosition(1))
 	V := bitset.BitPosition(1)
 
 	if S.IsEqual(T) != false || U.IsEqual(V) != false || V.IsEqual(U) != false {
@@ -70,8 +61,7 @@ func TestIsUnequal(t *testing.T) {
 }
 
 func TestRemove(t *testing.T) {
-	S := bitset.NewBitSet()
-	S.Add(bitset.BitPosition(0), bitset.BitPosition(1), bitset.BitPosition(2))
+	S := bitset.NewBitSet(bitset.BitPosition(0), bitset.BitPosition(1), bitset.BitPosition(2))
 
 	S.Remove(bitset.BitPosition(1))
 
@@ -135,12 +125,8 @@ func TestResize(t *testing.T) {
 
 func TestIntersect(t *testing.T) {
 
-	S := bitset.NewBitSet()
-	S.Add(bitset.BitPosition(1), bitset.BitPosition(2), bitset.BitPosition(3))
-
-	T := bitset.NewBitSet()
-	T.Add(bitset.BitPosition(2), bitset.BitPosition(3), bitset.BitPosition(64))
-
+	S := bitset.NewBitSet(bitset.BitPosition(1), bitset.BitPosition(2), bitset.BitPosition(3))
+	T := bitset.NewBitSet(bitset.BitPosition(2), bitset.BitPosition(3), bitset.BitPosition(64))
 	U := bitset.Intersect(S, T)
 
 	u0, _ := U.At(0)
@@ -152,12 +138,8 @@ func TestIntersect(t *testing.T) {
 
 func TestJoin(t *testing.T) {
 
-	S := bitset.NewBitSet()
-	S.Add(bitset.BitPosition(1), bitset.BitPosition(2), bitset.BitPosition(3))
-
-	T := bitset.NewBitSet()
-	T.Add(bitset.BitPosition(2), bitset.BitPosition(3), bitset.BitPosition(64))
-
+	S := bitset.NewBitSet(bitset.BitPosition(1), bitset.BitPosition(2), bitset.BitPosition(3))
+	T := bitset.NewBitSet(bitset.BitPosition(2), bitset.BitPosition(3), bitset.BitPosition(64))
 	U := bitset.Join(S, T)
 
 	u0, _ := U.At(0)
