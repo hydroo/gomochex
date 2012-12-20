@@ -19,9 +19,16 @@ type StateSet set.Set
 
 type Nfa interface {
 	Alphabet() Alphabet
+	SetAlphabet(Alphabet)
+
 	InitialStates() StateSet
+	SetInitialStates(StateSet)
+
 	FinalStates() StateSet
+	SetFinalStates(StateSet)
+
 	States() StateSet
+	SetStates(StateSet)
 
 	String() string
 
@@ -51,16 +58,32 @@ func (A simpleNfa) Alphabet() Alphabet {
 	return A.alphabet
 }
 
+func (A simpleNfa) SetAlphabet(sigma Alphabet) {
+	A.alphabet = sigma
+}
+
 func (A simpleNfa) InitialStates() StateSet {
 	return A.initialStates
+}
+
+func (A simpleNfa) SetInitialStates(S StateSet) {
+	A.initialStates = S
 }
 
 func (A simpleNfa) FinalStates() StateSet {
 	return A.finalStates
 }
 
+func (A simpleNfa) SetFinalStates(F StateSet) {
+	A.finalStates = F
+}
+
 func (A simpleNfa) States() StateSet {
 	return A.states
+}
+
+func (A simpleNfa) SetStates(S StateSet) {
+	A.states = S
 }
 
 func (A simpleNfa) String() string {
