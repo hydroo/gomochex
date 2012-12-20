@@ -27,7 +27,6 @@ func (e con) Nfa() nfa.Nfa {
 
 	//TODO
 	ret := nfa.NewNfa()
-
 	return ret
 }
 
@@ -75,19 +74,7 @@ func (e or) String() string {
 func (e or) Nfa() nfa.Nfa {
 
 	//TODO
-	l, r := e.l.Nfa(), e.r.Nfa()
-
 	ret := nfa.NewNfa()
-
-	for i := 0; i < l.Alphabet().Size(); i += 1 {
-		a, _ := l.Alphabet().At(i)
-		ret.Alphabet().Add(a)
-	}
-	for i := 0; i < r.Alphabet().Size(); i += 1 {
-		a, _ := r.Alphabet().At(i)
-		ret.Alphabet().Add(a)
-	}
-
 	return ret
 }
 
@@ -103,7 +90,6 @@ func (e star) Nfa() nfa.Nfa {
 
 	//TODO
 	ret := nfa.NewNfa()
-
 	return ret
 }
 
