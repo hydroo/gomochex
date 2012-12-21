@@ -70,34 +70,30 @@ func TestLetterNfa(t *testing.T) {
 	if A.Alphabet().Size() != 1 || A.States().Size() != 2 || A.InitialStates().Size() != 1 || A.FinalStates().Size() != 1 {
 		t.Error()
 	}
-
-	if b, ok := A.Alphabet().At(0); ok != true || b.IsEqual(a) == false {
+	if A.Alphabet().Probe(a) != true {
 		t.Error()
 	}
 
 	//has exactly one transition which is not a loop,
 	//and goes from an initial to a final state
 	for i := 0; i < A.States().Size(); i += 1 {
+		s, _ := A.States().At(i)
 		for j := 0; j < A.Alphabet().Size(); j += 1 {
+			x, _ := A.Alphabet().At(j)
+			S := A.Transition(s.(nfa.State), x.(nfa.Letter))
 
-			s, _ := A.States().At(i)
-			b, _ := A.Alphabet().At(j)
-
-			S := A.Transition(s.(nfa.State), b.(nfa.Letter))
-
-			if S.Size() != 0 {
-
-				if S.Size() != 1 {
-					t.Error()
-				}
-
-				u, _ := S.At(0)
-
-				if s.IsEqual(u) || A.InitialStates().Probe(s) == false || A.FinalStates().Probe(u) == false {
-					t.Error()
-				}
+			if S.Size() == 0 {
+				continue
+			}
+			if S.Size() != 1 {
+				t.Error()
 			}
 
+			u, _ := S.At(0)
+
+			if s.IsEqual(u) || A.InitialStates().Probe(s) == false || A.FinalStates().Probe(u) == false {
+				t.Error()
+			}
 		}
 	}
 }
@@ -111,10 +107,7 @@ func TestOrNfa(t *testing.T) {
 	if A.Alphabet().Size() != 2 || A.States().Size() != 4 || A.InitialStates().Size() != 2 || A.FinalStates().Size() != 2 {
 		t.Error()
 	}
-	if x, ok := A.Alphabet().At(0); ok != true || x.IsEqual(a) == false {
-		t.Error()
-	}
-	if x, ok := A.Alphabet().At(1); ok != true || x.IsEqual(b) == false {
+	if A.Alphabet().Probe(a) != true || A.Alphabet().Probe(b) != true {
 		t.Error()
 	}
 
@@ -124,35 +117,33 @@ func TestOrNfa(t *testing.T) {
 	transitionCount := 0
 	var lastLetter set.Element
 	for i := 0; i < A.States().Size(); i += 1 {
+		s, _ := A.States().At(i)
 		for j := 0; j < A.Alphabet().Size(); j += 1 {
+			x, _ := A.Alphabet().At(j)
+			S := A.Transition(s.(nfa.State), x.(nfa.Letter))
 
-			s, _ := A.States().At(i)
-			c, _ := A.Alphabet().At(j)
-
-			S := A.Transition(s.(nfa.State), c.(nfa.Letter))
-
-			if S.Size() != 0 {
-
-				if S.Size() != 1 {
-					t.Error()
-				}
-
-				u, _ := S.At(0)
-
-				if s.IsEqual(u) || A.InitialStates().Probe(s) == false || A.FinalStates().Probe(u) == false {
-					t.Error()
-				}
-
-				if transitionCount == 0 {
-					lastLetter = c
-				} else if transitionCount == 1 {
-					if lastLetter.IsEqual(c) {
-						t.Error()
-					}
-				}
-
-				transitionCount += 1
+			if S.Size() == 0 {
+				continue
 			}
+			if S.Size() != 1 {
+				t.Error()
+			}
+
+			u, _ := S.At(0)
+
+			if s.IsEqual(u) || A.InitialStates().Probe(s) == false || A.FinalStates().Probe(u) == false {
+				t.Error()
+			}
+
+			if transitionCount == 0 {
+				lastLetter = x
+			} else if transitionCount == 1 {
+				if lastLetter.IsEqual(x) {
+					t.Error()
+				}
+			}
+
+			transitionCount += 1
 		}
 	}
 
