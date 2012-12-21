@@ -91,7 +91,7 @@ func TestLetterNfa(t *testing.T) {
 
 			u, _ := S.At(0)
 
-			if s.IsEqual(u) || A.InitialStates().Probe(s) == false || A.FinalStates().Probe(u) == false {
+			if s.IsEqual(u) || A.InitialStates().Probe(s) != true || A.FinalStates().Probe(s) != false || A.FinalStates().Probe(u) != true || A.InitialStates().Probe(u) != false {
 				t.Error()
 			}
 		}
@@ -131,7 +131,7 @@ func TestOrNfa(t *testing.T) {
 
 			u, _ := S.At(0)
 
-			if s.IsEqual(u) || A.InitialStates().Probe(s) == false || A.FinalStates().Probe(u) == false {
+			if s.IsEqual(u) || A.InitialStates().Probe(s) != true || A.FinalStates().Probe(s) != false || A.FinalStates().Probe(u) != true || A.InitialStates().Probe(u) != false {
 				t.Error()
 			}
 
