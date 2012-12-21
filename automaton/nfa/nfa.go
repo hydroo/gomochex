@@ -6,6 +6,7 @@ import (
 )
 
 type State string
+
 func (s State) IsEqual(e set.Element) bool {
 	f, ok := e.(State)
 	if ok == false {
@@ -16,6 +17,7 @@ func (s State) IsEqual(e set.Element) bool {
 }
 
 type Letter string
+
 func (s Letter) IsEqual(e set.Element) bool {
 	f, ok := e.(Letter)
 	if ok == false {
@@ -169,4 +171,3 @@ func (A *simpleNfa) SetTransitionFunction(delta func(State, Letter) StateSet) {
 		}
 	}
 }
-

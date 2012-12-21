@@ -30,19 +30,18 @@ func (e concatExpression) Nfa() nfa.Nfa {
 
 	A.SetAlphabet(set.Join(L.Alphabet(), R.Alphabet()))
 
-
 	//add R as it is with a 1 prepended to all states
 	//add L as it is with a 0 prepended to all states
 	for k, T := range []nfa.Nfa{L, R} {
 		for i := 0; i < T.States().Size(); i += 1 {
 			s, _ := T.States().At(i)
-			s_ := nfa.State(fmt.Sprint(k,s))
+			s_ := nfa.State(fmt.Sprint(k, s))
 
 			A.States().Add(s_)
 
-			if k == 1 && T.FinalStates().Probe(s) == true {//R
+			if k == 1 && T.FinalStates().Probe(s) == true { //R
 				A.FinalStates().Add(s_)
-			} else if k == 0 && L.InitialStates().Probe(s) == true {//L
+			} else if k == 0 && L.InitialStates().Probe(s) == true { //L
 				A.InitialStates().Add(s_)
 			}
 
@@ -53,10 +52,10 @@ func (e concatExpression) Nfa() nfa.Nfa {
 				S_ := set.NewSet()
 				for k := 0; k < S.Size(); k += 1 {
 					t, _ := S.At(k)
-					S_.Add(nfa.State(fmt.Sprint(1,t)))
+					S_.Add(nfa.State(fmt.Sprint(1, t)))
 				}
 
-				A.SetTransition(s_ , a.(nfa.Letter), S_)
+				A.SetTransition(s_, a.(nfa.Letter), S_)
 			}
 		}
 	}
@@ -65,12 +64,12 @@ func (e concatExpression) Nfa() nfa.Nfa {
 	S_ := set.NewSet()
 	for i := 0; i < R.InitialStates().Size(); i += 1 {
 		s, _ := R.InitialStates().At(i)
-		S_.Add(nfa.State(fmt.Sprint(1,s)))
+		S_.Add(nfa.State(fmt.Sprint(1, s)))
 	}
 
 	for i := 0; i < L.States().Size(); i += 1 {
 		s, _ := L.States().At(i)
-		s_ := nfa.State(fmt.Sprint(0,s))
+		s_ := nfa.State(fmt.Sprint(0, s))
 
 		for j := 0; j < L.Alphabet().Size(); j += 1 {
 			a, _ := L.Alphabet().At(j)
@@ -129,7 +128,7 @@ func (e orExpression) Nfa() nfa.Nfa {
 
 		for i := 0; i < T.States().Size(); i += 1 {
 			s, _ := T.States().At(i)
-			ss := nfa.State(fmt.Sprint(k,s))
+			ss := nfa.State(fmt.Sprint(k, s))
 			A.States().Add(ss)
 
 			if T.InitialStates().Probe(s) == true {
@@ -146,7 +145,7 @@ func (e orExpression) Nfa() nfa.Nfa {
 				SS := set.NewSet()
 				for l := 0; l < S.Size(); l += 1 {
 					t, _ := S.At(l)
-					SS.Add(nfa.State(fmt.Sprint(k,t)))
+					SS.Add(nfa.State(fmt.Sprint(k, t)))
 				}
 
 				A.SetTransition(ss, a.(nfa.Letter), SS)

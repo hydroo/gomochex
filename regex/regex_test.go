@@ -78,7 +78,7 @@ func TestConcatNfa(t *testing.T) {
 	//       -- a --> o -- c --> □
 	transitionCount := 0
 	var lastLetter set.Element = nil //makes sure no two π or c transitions occur
-	visitedRStates := set.NewSet() //makes sure the two π and c transitions use entirely different states
+	visitedRStates := set.NewSet()   //makes sure the two π and c transitions use entirely different states
 	for i := 0; i < A.States().Size(); i += 1 {
 		s, _ := A.States().At(i)
 		for j := 0; j < A.Alphabet().Size(); j += 1 {
