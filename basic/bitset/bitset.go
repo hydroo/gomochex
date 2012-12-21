@@ -19,7 +19,9 @@ type BitSet []uint64
 
 func NewBitSet(bits ...BitPosition) BitSet {
 	ret := make(BitSet, 0)
-	ret.Add(bits)
+	for _, b := range bits {
+		ret.Add(b)
+	}
 	return ret
 }
 
