@@ -63,9 +63,43 @@ func (e orExpression) String() string {
 }
 
 func (e orExpression) Nfa() nfa.Nfa {
-	//TODO
-	ret := nfa.NewNfa()
-	return ret
+	L := e.l.Nfa()
+	R := e.r.Nfa()
+	A := nfa.NewNfa()
+
+	A.SetAlphabet(set.Join(L.Alphabet(), R.Alphabet()))
+
+	for k, T := range []nfa.Nfa{L, R} {
+
+		for i := 0; i < T.States().Size(); i += 1 {
+			s, _ := T.States().At(i)
+			ss := nfa.State(fmt.Sprint(k,s))
+			A.States().Add(ss)
+
+			if T.InitialStates().Probe(s) == true {
+				A.InitialStates().Add(ss)
+			}
+			if T.FinalStates().Probe(s) == true {
+				A.FinalStates().Add(ss)
+			}
+
+			for j := 0; j < T.Alphabet().Size(); j += 1 {
+				a, _ := T.Alphabet().At(j)
+
+				S := T.Transition(s.(nfa.State), a.(nfa.Letter))
+				SS := set.NewSet()
+				for l := 0; l < S.Size(); l += 1 {
+					t, _ := S.At(l)
+					SS.Add(nfa.State(fmt.Sprint(k,t)))
+				}
+
+				A.SetTransition(ss, a.(nfa.Letter), SS)
+			}
+		}
+
+	}
+
+	return A
 }
 
 type starExpression struct {

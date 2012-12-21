@@ -3,6 +3,7 @@ package regex_test
 import (
 	"fmt"
 	"github.com/hydroo/gomochex/automaton/nfa"
+	"github.com/hydroo/gomochex/basic/set"
 	"github.com/hydroo/gomochex/regex"
 	"testing"
 )
@@ -102,7 +103,62 @@ func TestLetterNfa(t *testing.T) {
 }
 
 func TestOrNfa(t *testing.T) {
-	//TODO
+	a := nfa.Letter("a")
+	b := nfa.Letter("π")
+
+	A := regex.Or(regex.Letter("a"), regex.Letter("π")).Nfa()
+
+	if A.Alphabet().Size() != 2 || A.States().Size() != 4 || A.InitialStates().Size() != 2 || A.FinalStates().Size() != 2 {
+		t.Error()
+	}
+	if x, ok := A.Alphabet().At(0); ok != true || x.IsEqual(a) == false {
+		t.Error()
+	}
+	if x, ok := A.Alphabet().At(1); ok != true || x.IsEqual(b) == false {
+		t.Error()
+	}
+
+	//has exactly two transitions which are not loops,
+	//both go from an initial to a final state,
+	//and use two different letters
+	transitionCount := 0
+	var lastLetter set.Element
+	for i := 0; i < A.States().Size(); i += 1 {
+		for j := 0; j < A.Alphabet().Size(); j += 1 {
+
+			s, _ := A.States().At(i)
+			c, _ := A.Alphabet().At(j)
+
+			S := A.Transition(s.(nfa.State), c.(nfa.Letter))
+
+			if S.Size() != 0 {
+
+				if S.Size() != 1 {
+					t.Error()
+				}
+
+				u, _ := S.At(0)
+
+				if s.IsEqual(u) || A.InitialStates().Probe(s) == false || A.FinalStates().Probe(u) == false {
+					t.Error()
+				}
+
+				if transitionCount == 0 {
+					lastLetter = c
+				} else if transitionCount == 1 {
+					if lastLetter.IsEqual(c) {
+						t.Error()
+					}
+				}
+
+				transitionCount += 1
+			}
+		}
+	}
+
+	if transitionCount != 2 {
+		t.Error()
+	}
 }
 
 func TestStarNfa(t *testing.T) {
