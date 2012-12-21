@@ -67,7 +67,7 @@ func (A simpleNfa) Alphabet() Alphabet {
 	return A.alphabet
 }
 
-func (A simpleNfa) SetAlphabet(sigma Alphabet) {
+func (A *simpleNfa) SetAlphabet(sigma Alphabet) {
 	A.alphabet = sigma
 }
 
@@ -75,7 +75,7 @@ func (A simpleNfa) InitialStates() StateSet {
 	return A.initialStates
 }
 
-func (A simpleNfa) SetInitialStates(S StateSet) {
+func (A *simpleNfa) SetInitialStates(S StateSet) {
 	A.initialStates = S
 }
 
@@ -83,7 +83,7 @@ func (A simpleNfa) FinalStates() StateSet {
 	return A.finalStates
 }
 
-func (A simpleNfa) SetFinalStates(F StateSet) {
+func (A *simpleNfa) SetFinalStates(F StateSet) {
 	A.finalStates = F
 }
 
