@@ -24,9 +24,65 @@ func (e concatExpression) String() string {
 }
 
 func (e concatExpression) Nfa() nfa.Nfa {
-	//TODO
-	ret := nfa.NewNfa()
-	return ret
+	L := e.l.Nfa()
+	R := e.r.Nfa()
+	A := nfa.NewNfa()
+
+	A.SetAlphabet(set.Join(L.Alphabet(), R.Alphabet()))
+
+
+	//add R as it is with a 1 prepended to all states
+	//add L as it is with a 0 prepended to all states
+	for k, T := range []nfa.Nfa{L, R} {
+		for i := 0; i < T.States().Size(); i += 1 {
+			s, _ := T.States().At(i)
+			s_ := nfa.State(fmt.Sprint(k,s))
+
+			A.States().Add(s_)
+
+			if k == 1 && T.FinalStates().Probe(s) == true {//R
+				A.FinalStates().Add(s_)
+			} else if k == 0 && L.InitialStates().Probe(s) == true {//L
+				A.InitialStates().Add(s_)
+			}
+
+			for j := 0; j < T.Alphabet().Size(); j += 1 {
+				a, _ := T.Alphabet().At(j)
+				S := T.Transition(s.(nfa.State), a.(nfa.Letter))
+
+				S_ := set.NewSet()
+				for k := 0; k < S.Size(); k += 1 {
+					t, _ := S.At(k)
+					S_.Add(nfa.State(fmt.Sprint(1,t)))
+				}
+
+				A.SetTransition(s_ , a.(nfa.Letter), S_)
+			}
+		}
+	}
+
+	// add transititons from before final states in L to all initial states in R
+	S_ := set.NewSet()
+	for i := 0; i < R.InitialStates().Size(); i += 1 {
+		s, _ := R.InitialStates().At(i)
+		S_.Add(nfa.State(fmt.Sprint(1,s)))
+	}
+
+	for i := 0; i < L.States().Size(); i += 1 {
+		s, _ := L.States().At(i)
+		s_ := nfa.State(fmt.Sprint(0,s))
+
+		for j := 0; j < L.Alphabet().Size(); j += 1 {
+			a, _ := L.Alphabet().At(j)
+			S := L.Transition(s.(nfa.State), a.(nfa.Letter))
+
+			if set.Intersect(L.FinalStates(), S).Size() > 0 {
+				A.SetTransition(s_, a.(nfa.Letter), set.Join(A.Transition(s_, a.(nfa.Letter)), S_))
+			}
+		}
+	}
+
+	return A
 }
 
 type letterExpression struct {
