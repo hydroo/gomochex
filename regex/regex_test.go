@@ -62,7 +62,7 @@ func TestConcatNfa(t *testing.T) {
 
 func TestLetterNfa(t *testing.T) {
 
-	a := nfa.StringLetter("a")
+	a := nfa.Letter("a")
 
 	A := regex.Letter("a").Nfa()
 
@@ -70,7 +70,7 @@ func TestLetterNfa(t *testing.T) {
 		t.Error()
 	}
 
-	if b, ok := A.Alphabet().At(0); ok != true || b.IsEqual(nfa.StringLetter(a)) == false {
+	if b, ok := A.Alphabet().At(0); ok != true || b.IsEqual(a) == false {
 		t.Error()
 	}
 
@@ -82,7 +82,7 @@ func TestLetterNfa(t *testing.T) {
 			q0, _ := A.States().At(i)
 			b, _ := A.Alphabet().At(j)
 
-			S := A.Transition(q0, b)
+			S := A.Transition(q0.(nfa.State), b.(nfa.Letter))
 
 			if S.Size() != 0 {
 

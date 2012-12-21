@@ -15,11 +15,11 @@ import (
 //
 func TestSimpleNfa(t *testing.T) {
 
-	a := nfa.StringLetter("a")
-	b := nfa.StringLetter("b")
-	s1 := nfa.StringState("1")
-	s2 := nfa.StringState("2")
-	s3 := nfa.StringState("3")
+	a := nfa.Letter("a")
+	b := nfa.Letter("b")
+	s1 := nfa.State("1")
+	s2 := nfa.State("2")
+	s3 := nfa.State("3")
 
 	A := nfa.NewNfa()
 

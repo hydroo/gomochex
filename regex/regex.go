@@ -15,34 +15,34 @@ type Expression interface {
 
 /*****************************************************************************/
 
-type concat struct {
+type concatExpression struct {
 	l, r Expression
 }
 
-func (e concat) String() string {
+func (e concatExpression) String() string {
 	return fmt.Sprint("(", e.l, ".", e.r, ")")
 }
 
-func (e concat) Nfa() nfa.Nfa {
+func (e concatExpression) Nfa() nfa.Nfa {
 	//TODO
 	ret := nfa.NewNfa()
 	return ret
 }
 
-type letter struct {
+type letterExpression struct {
 	l string
 }
 
-func (e letter) String() string {
-	return fmt.Sprint(e.l)
+func (e letterExpression) String() string {
+	return e.l
 }
 
-func (e letter) Nfa() nfa.Nfa {
+func (e letterExpression) Nfa() nfa.Nfa {
 	ret := nfa.NewNfa()
 
-	l := nfa.StringLetter(e.l)
-	q0 := nfa.StringState("0")
-	qf := nfa.StringState("f")
+	l := nfa.Letter(e.l)
+	q0 := nfa.State("0")
+	qf := nfa.State("f")
 
 	ret.Alphabet().Add(l)
 	ret.States().Add(q0, qf)
@@ -62,29 +62,29 @@ func (e letter) Nfa() nfa.Nfa {
 	return ret
 }
 
-type or struct {
+type orExpression struct {
 	l, r Expression
 }
 
-func (e or) String() string {
+func (e orExpression) String() string {
 	return fmt.Sprint("(", e.l, "+", e.r, ")")
 }
 
-func (e or) Nfa() nfa.Nfa {
+func (e orExpression) Nfa() nfa.Nfa {
 	//TODO
 	ret := nfa.NewNfa()
 	return ret
 }
 
-type star struct {
+type starExpression struct {
 	f Expression
 }
 
-func (e star) String() string {
+func (e starExpression) String() string {
 	return fmt.Sprint("(", e.f, ")*")
 }
 
-func (e star) Nfa() nfa.Nfa {
+func (e starExpression) Nfa() nfa.Nfa {
 	//TODO
 	ret := nfa.NewNfa()
 	return ret
@@ -93,26 +93,25 @@ func (e star) Nfa() nfa.Nfa {
 /*****************************************************************************/
 
 func Concat(l, r Expression) Expression {
-	return &concat{l, r}
+	return &concatExpression{l, r}
 }
 
 func Letter(l string) Expression {
-	return &letter{l}
+	return &letterExpression{l}
 }
 
 func Or(l, r Expression) Expression {
-	return &or{l, r}
+	return &orExpression{l, r}
 }
 
 func Star(e Expression) Expression {
-	return &star{e}
+	return &starExpression{e}
 }
 
 /*****************************************************************************/
 
 func ExpressionFromString(s string) (Expression, bool) {
-	s = strings.Replace(s, " ", "", -1)
-	return expressionFromStringRecursively(s)
+	return expressionFromStringRecursively(strings.Replace(s, " ", "", -1))
 }
 
 func expressionFromStringRecursively(s string) (Expression, bool) {

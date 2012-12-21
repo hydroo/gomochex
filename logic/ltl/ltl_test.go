@@ -8,7 +8,7 @@ import (
 
 func TestCreateFormula(t *testing.T) {
 
-	if phi := ltl.Or(ltl.Not(ltl.And(ltl.AP("π"), ltl.Not(ltl.AP("prΘp")))), ltl.AP("a")); fmt.Sprint(phi) != "(¬((π∧¬(prΘp)))∨a)" {
+	if phi := ltl.Or(ltl.Not(ltl.And(ltl.Ap("π"), ltl.Not(ltl.Ap("prΘp")))), ltl.Ap("a")); fmt.Sprint(phi) != "(¬((π∧¬(prΘp)))∨a)" {
 		t.Error()
 	}
 }

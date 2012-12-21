@@ -5,12 +5,24 @@ import (
 	"github.com/hydroo/gomochex/basic/set"
 )
 
-type State interface {
-	set.Element
+type State string
+func (s State) IsEqual(e set.Element) bool {
+	f, ok := e.(State)
+	if ok == false {
+		return false
+	} //else {
+	return s == f
+	//}
 }
 
-type Letter interface {
-	set.Element
+type Letter string
+func (s Letter) IsEqual(e set.Element) bool {
+	f, ok := e.(Letter)
+	if ok == false {
+		return false
+	} //else {
+	return s == f
+	//}
 }
 
 type Alphabet set.Set
@@ -94,7 +106,7 @@ func (A simpleNfa) String() string {
 		for j := 0; j < A.Alphabet().Size(); j += 1 {
 			s, _ := A.States().At(i)
 			a, _ := A.Alphabet().At(j)
-			if next := A.transition(s, a); next.Size() > 0 {
+			if next := A.transition(s.(State), a.(Letter)); next.Size() > 0 {
 				ret += fmt.Sprintln(" ", s, "--", a, "-->", next)
 			}
 		}
@@ -111,26 +123,3 @@ func (A *simpleNfa) SetTransitionFunction(delta func(State, Letter) StateSet) {
 	A.transition = delta
 }
 
-/*****************************************************************************/
-
-type StringState string
-
-func (s StringState) IsEqual(e set.Element) bool {
-	f, ok := e.(StringState)
-	if ok == false {
-		return false
-	} //else {
-	return s == f
-	//}
-}
-
-type StringLetter string
-
-func (s StringLetter) IsEqual(e set.Element) bool {
-	f, ok := e.(StringLetter)
-	if ok == false {
-		return false
-	} //else {
-	return s == f
-	//}
-}

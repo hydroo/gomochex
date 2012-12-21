@@ -102,7 +102,7 @@ func And(phi, psi Formula) Formula {
 }
 
 // atomic proposition
-func AP(a string) Formula {
+func Ap(a string) Formula {
 	return aPFormula{a}
 }
 
@@ -137,8 +137,7 @@ func Until(phi, psi Formula) Formula {
 /*****************************************************************************/
 
 func FormulaFromString(phi string) (Formula, bool) {
-	phi = strings.Replace(phi, " ", "", -1)
-	return formulaFromStringRecursively(phi)
+	return formulaFromStringRecursively(strings.Replace(phi, " ", "", -1))
 }
 
 func formulaFromStringRecursively(phi string) (Formula, bool) {
@@ -209,7 +208,7 @@ func formulaFromStringRecursively(phi string) (Formula, bool) {
 		} else if phi == "true" {
 			return True(), true
 		} else {
-			return AP(phi), true
+			return Ap(phi), true
 		}
 	}
 
