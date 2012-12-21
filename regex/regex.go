@@ -49,15 +49,7 @@ func (e letterExpression) Nfa() nfa.Nfa {
 	ret.InitialStates().Add(q0)
 	ret.FinalStates().Add(qf)
 
-	trans := func(s nfa.State, m nfa.Letter) nfa.StateSet {
-		S := set.NewSet()
-		if s.IsEqual(q0) && m.IsEqual(l) {
-			S.Add(qf)
-		}
-		return S
-	}
-
-	ret.SetTransitionFunction(trans)
+	ret.SetTransition(q0, l, set.NewSet(qf))
 
 	return ret
 }
