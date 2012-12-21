@@ -79,10 +79,10 @@ func TestLetterNfa(t *testing.T) {
 	for i := 0; i < A.States().Size(); i += 1 {
 		for j := 0; j < A.Alphabet().Size(); j += 1 {
 
-			q0, _ := A.States().At(i)
+			s, _ := A.States().At(i)
 			b, _ := A.Alphabet().At(j)
 
-			S := A.Transition(q0.(nfa.State), b.(nfa.Letter))
+			S := A.Transition(s.(nfa.State), b.(nfa.Letter))
 
 			if S.Size() != 0 {
 
@@ -90,9 +90,9 @@ func TestLetterNfa(t *testing.T) {
 					t.Error()
 				}
 
-				qf, _ := S.At(0)
+				u, _ := S.At(0)
 
-				if q0.IsEqual(qf) || A.InitialStates().Probe(q0) == false || A.FinalStates().Probe(qf) == false {
+				if s.IsEqual(u) || A.InitialStates().Probe(s) == false || A.FinalStates().Probe(u) == false {
 					t.Error()
 				}
 			}

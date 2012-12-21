@@ -38,20 +38,20 @@ func (e letterExpression) String() string {
 }
 
 func (e letterExpression) Nfa() nfa.Nfa {
-	ret := nfa.NewNfa()
+	A := nfa.NewNfa()
 
 	l := nfa.Letter(e.l)
 	q0 := nfa.State("0")
 	qf := nfa.State("f")
 
-	ret.Alphabet().Add(l)
-	ret.States().Add(q0, qf)
-	ret.InitialStates().Add(q0)
-	ret.FinalStates().Add(qf)
+	A.Alphabet().Add(l)
+	A.States().Add(q0, qf)
+	A.InitialStates().Add(q0)
+	A.FinalStates().Add(qf)
 
-	ret.SetTransition(q0, l, set.NewSet(qf))
+	A.SetTransition(q0, l, set.NewSet(qf))
 
-	return ret
+	return A
 }
 
 type orExpression struct {
