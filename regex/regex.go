@@ -41,7 +41,7 @@ func (e concatExpression) Nfa() nfa.Nfa {
 
 			if k == 1 && T.FinalStates().Probe(s) == true { //R
 				A.FinalStates().Add(s_)
-			} else if k == 0 && L.InitialStates().Probe(s) == true { //L
+			} else if k == 0 && T.InitialStates().Probe(s) == true { //L
 				A.InitialStates().Add(s_)
 			}
 
@@ -50,9 +50,9 @@ func (e concatExpression) Nfa() nfa.Nfa {
 				S := T.Transition(s.(nfa.State), a.(nfa.Letter))
 
 				S_ := set.NewSet()
-				for k := 0; k < S.Size(); k += 1 {
-					t, _ := S.At(k)
-					S_.Add(nfa.State(fmt.Sprint(1, t)))
+				for l := 0; l < S.Size(); l += 1 {
+					t, _ := S.At(l)
+					S_.Add(nfa.State(fmt.Sprint(k, t)))
 				}
 
 				A.SetTransition(s_, a.(nfa.Letter), S_)

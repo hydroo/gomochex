@@ -126,6 +126,43 @@ func TestConcatNfa(t *testing.T) {
 	}
 }
 
+func TestConcatNfa2(t *testing.T) {
+	a := nfa.Letter("a")
+
+	A := regex.Concat(regex.Letter("a"), regex.Letter("a")).Nfa()
+
+	if A.Alphabet().Size() != 1 || A.States().Size() < 3 || A.States().Size() > 4 || A.InitialStates().Size() != 1 || A.FinalStates().Size() != 1 {
+		t.Error()
+	}
+	if A.Alphabet().Probe(a) != true {
+		t.Error()
+	}
+
+	q0_, _ := A.InitialStates().At(0)
+	q0 := q0_.(nfa.State)
+
+	Q0 := A.Transition(q0, a)
+	if Q0.Size() < 1 || Q0.Size() > 2 {
+		t.Error()
+	}
+
+	q1_, _ := Q0.At(0)
+	q1 := q1_.(nfa.State)
+	if A.Transition(q1, a).Size() == 0 {
+		q1_, _ = Q0.At(1)
+		q1 = q1_.(nfa.State)
+	}
+
+	Q1 := A.Transition(q1, a);
+	if Q1.Size() != 1 {
+		t.Error()
+	}
+
+	if set.Intersect(Q1, A.FinalStates()).Size() != 1 {
+		t.Error()
+	}
+}
+
 func TestLetterNfa(t *testing.T) {
 
 	a := nfa.Letter("a")
