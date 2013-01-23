@@ -170,13 +170,12 @@ func (e starExpression) Nfa() nfa.Nfa {
 	A := e.f.Nfa()
 
 	var q0 nfa.State
-	for i := 0;; i += 1 {
+	for i := 0; ; i += 1 {
 		q0 = nfa.State(fmt.Sprint(i))
 		if A.States().Probe(q0) == false {
 			break
 		}
 	}
-
 
 	A.States().Add(q0)
 

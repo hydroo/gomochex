@@ -153,7 +153,7 @@ func TestConcatNfa2(t *testing.T) {
 		q1 = q1_.(nfa.State)
 	}
 
-	Q1 := A.Transition(q1, a);
+	Q1 := A.Transition(q1, a)
 	if Q1.Size() != 1 {
 		t.Error()
 	}
@@ -259,7 +259,7 @@ func TestStarNfa(t *testing.T) {
 	a := nfa.Letter("a")
 	b := nfa.Letter("π")
 
-	A := regex.Star(regex.Or(regex.Concat(regex.Letter("a"),regex.Letter("a")), regex.Concat(regex.Letter("π"), regex.Letter("π")))).Nfa()
+	A := regex.Star(regex.Or(regex.Concat(regex.Letter("a"), regex.Letter("a")), regex.Concat(regex.Letter("π"), regex.Letter("π")))).Nfa()
 
 	// the maximal nfa has 9 states and a lot of transitions to useless states
 	//
