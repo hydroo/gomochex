@@ -23,6 +23,7 @@ type Set interface {
 	String() string
 	Add(elements ...Element)
 	At(index int) (Element, bool)
+	Clear()
 	Probe(e Element) bool
 	Remove(elements ...Element)
 	Size() int
@@ -81,6 +82,10 @@ func (S simpleSet) At(index int) (Element, bool) {
 	} //else {
 	return S[0], false
 	//}
+}
+
+func (S *simpleSet) Clear() {
+	*S = *(NewSet().(*simpleSet))
 }
 
 func (S simpleSet) Copy() Copier {
