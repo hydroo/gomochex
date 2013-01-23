@@ -166,9 +166,63 @@ func (e starExpression) String() string {
 }
 
 func (e starExpression) Nfa() nfa.Nfa {
-	//TODO
-	ret := nfa.NewNfa()
-	return ret
+
+	A := e.f.Nfa()
+
+	var q0 nfa.State
+	for i := 0;; i += 1 {
+		q0 = nfa.State(fmt.Sprint(i))
+		if A.States().Probe(q0) == false {
+			break
+		}
+	}
+
+
+	A.States().Add(q0)
+
+	// add transitions from before final states to the new initial state
+	for i := 0; i < A.States().Size(); i += 1 {
+		for j := 0; j < A.Alphabet().Size(); j += 1 {
+
+			q_, _ := A.States().At(i)
+			q := q_.(nfa.State)
+
+			a_, _ := A.Alphabet().At(j)
+			a := a_.(nfa.Letter)
+
+			Q := A.Transition(q, a)
+
+			if set.Intersect(Q, A.FinalStates()).Size() != 0 {
+				Q.Add(q0)
+				A.SetTransition(q, a, Q)
+			}
+		}
+	}
+
+	// add transitions from the new initial state
+	// to the destinations of the old initial states
+	for i := 0; i < A.InitialStates().Size(); i += 1 {
+		for j := 0; j < A.Alphabet().Size(); j += 1 {
+
+			q_, _ := A.InitialStates().At(i)
+			q := q_.(nfa.State)
+
+			a_, _ := A.Alphabet().At(j)
+			a := a_.(nfa.Letter)
+
+			Q := A.Transition(q, a)
+			Q0 := A.Transition(q0, a)
+
+			A.SetTransition(q0, a, set.Join(Q, Q0))
+		}
+	}
+
+	A.InitialStates().Clear()
+	A.InitialStates().Add(q0)
+	A.FinalStates().Clear()
+	A.FinalStates().Add(q0)
+
+	return A
 }
 
 /*****************************************************************************/

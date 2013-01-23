@@ -255,5 +255,86 @@ func TestOrNfa(t *testing.T) {
 }
 
 func TestStarNfa(t *testing.T) {
-	//TODO
+
+	a := nfa.Letter("a")
+	b := nfa.Letter("π")
+
+	A := regex.Star(regex.Or(regex.Concat(regex.Letter("a"),regex.Letter("a")), regex.Concat(regex.Letter("π"), regex.Letter("π")))).Nfa()
+
+	// the maximal nfa has 9 states and a lot of transitions to useless states
+	//
+	// minimal nfa:
+	//
+	// +-- a ---
+	// |        \
+	// | - a -> o
+	// v/
+	// □
+	// ^\
+	// | - π -> o
+	// |       /
+	// +-- π --
+
+	if A.Alphabet().Size() != 2 || A.States().Size() < 3 || A.States().Size() > 9 || A.InitialStates().Size() != 1 || A.FinalStates().Size() != 1 {
+		t.Error()
+	}
+	if A.Alphabet().Probe(a) != true || A.Alphabet().Probe(b) != true {
+		t.Error()
+	}
+	if A.InitialStates().IsEqual(A.FinalStates()) != true {
+		t.Error()
+	}
+
+	q0_, _ := A.InitialStates().At(0)
+	q0 := q0_.(nfa.State)
+
+	if A.Transition(q0, a).Size() < 1 || A.Transition(q0, a).Size() > 2 || A.Transition(q0, b).Size() < 1 || A.Transition(q0, b).Size() > 2 {
+		t.Error()
+	}
+
+	q1_, _ := A.Transition(q0, a).At(0)
+	q1 := q1_.(nfa.State)
+	if A.Transition(q1, a).Size() == 0 {
+		q1_, _ = A.Transition(q0, a).At(1)
+		q1 = q1_.(nfa.State)
+	}
+
+	q2_, _ := A.Transition(q0, b).At(0)
+	q2 := q2_.(nfa.State)
+	if A.Transition(q2, b).Size() == 0 {
+		q2_, _ = A.Transition(q0, b).At(1)
+		q2 = q2_.(nfa.State)
+	}
+
+	if A.Transition(q1, a).Size() < 1 || A.Transition(q1, a).Size() > 3 || A.Transition(q2, b).Size() < 1 || A.Transition(q2, b).Size() > 3 {
+		t.Error()
+	}
+
+	Q1 := A.Transition(q1, a)
+	Q2 := A.Transition(q2, b)
+
+	if Q1.Probe(q0) == false || Q2.Probe(q0) == false {
+		t.Error()
+	}
+
+	var q10, q20 nfa.State
+
+	if q, _ := Q1.At(0); q.IsEqual(q0) {
+		q10_, _ := Q1.At(1)
+		q10 = q10_.(nfa.State)
+	} else {
+		q10_, _ := Q1.At(0)
+		q10 = q10_.(nfa.State)
+	}
+	if q, _ := Q2.At(0); q.IsEqual(q0) {
+		q20_, _ := Q2.At(1)
+		q20 = q20_.(nfa.State)
+	} else {
+		q20_, _ := Q2.At(0)
+		q20 = q20_.(nfa.State)
+	}
+
+	if A.Transition(q10, a).Size() != 0 || A.Transition(q10, b).Size() != 0 || A.Transition(q20, a).Size() != 0 || A.Transition(q20, b).Size() != 0 {
+		t.Error()
+	}
 }
