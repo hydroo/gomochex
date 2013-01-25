@@ -10,6 +10,7 @@ import (
 
 type Expression interface {
 	String() string
+	IsEqual(Expression) bool
 	Nfa() nfa.Nfa
 }
 
@@ -21,6 +22,14 @@ type concatExpression struct {
 
 func (e concatExpression) String() string {
 	return fmt.Sprint("(", e.l, ".", e.r, ")")
+}
+
+func (e concatExpression) IsEqual(f_ Expression) bool {
+	if f, ok := f_.(concatExpression); ok == true {
+		return e.l.IsEqual(f.l) && e.r.IsEqual(f.r)
+	} // else {
+	return false
+	//}
 }
 
 func (e concatExpression) Nfa() nfa.Nfa {
@@ -92,6 +101,14 @@ func (e letterExpression) String() string {
 	return e.l
 }
 
+func (e letterExpression) IsEqual(f_ Expression) bool {
+	if f, ok := f_.(letterExpression); ok == true {
+		return e == f
+	} // else {
+	return false
+	//}
+}
+
 func (e letterExpression) Nfa() nfa.Nfa {
 	A := nfa.NewNfa()
 
@@ -115,6 +132,14 @@ type orExpression struct {
 
 func (e orExpression) String() string {
 	return fmt.Sprint("(", e.l, "+", e.r, ")")
+}
+
+func (e orExpression) IsEqual(f_ Expression) bool {
+	if f, ok := f_.(orExpression); ok == true {
+		return (e.l.IsEqual(f.l) && e.r.IsEqual(f.r)) || (e.l.IsEqual(f.r) && e.r.IsEqual(f.l))
+	} // else {
+	return false
+	//}
 }
 
 func (e orExpression) Nfa() nfa.Nfa {
@@ -163,6 +188,14 @@ type starExpression struct {
 
 func (e starExpression) String() string {
 	return fmt.Sprint("(", e.f, ")*")
+}
+
+func (e starExpression) IsEqual(f_ Expression) bool {
+	if f, ok := f_.(starExpression); ok == true {
+		return e.f.IsEqual(f.f)
+	} // else {
+	return false
+	//}
 }
 
 func (e starExpression) Nfa() nfa.Nfa {
