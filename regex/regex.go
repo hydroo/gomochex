@@ -260,19 +260,19 @@ func (e starExpression) Nfa() nfa.Nfa {
 /*****************************************************************************/
 
 func Concat(l, r Expression) Expression {
-	return &concatExpression{l, r}
+	return concatExpression{l, r}
 }
 
 func Letter(l string) Expression {
-	return &letterExpression{l}
+	return letterExpression{l}
 }
 
 func Or(l, r Expression) Expression {
-	return &orExpression{l, r}
+	return orExpression{l, r}
 }
 
 func Star(e Expression) Expression {
-	return &starExpression{e}
+	return starExpression{e}
 }
 
 /*****************************************************************************/
