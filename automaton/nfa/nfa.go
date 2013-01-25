@@ -93,7 +93,7 @@ func (A simpleNfa) States() StateSet {
 	return A.states
 }
 
-func (A simpleNfa) SetStates(S StateSet) {
+func (A *simpleNfa) SetStates(S StateSet) {
 	A.states = S
 }
 
