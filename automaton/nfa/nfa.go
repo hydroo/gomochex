@@ -49,6 +49,8 @@ type Nfa interface {
 	Transition(State, Letter) StateSet
 	SetTransition(State, Letter, StateSet)
 	SetTransitionFunction(func(State, Letter) StateSet)
+
+	Copy() Nfa
 }
 
 func NewNfa() Nfa {
@@ -170,4 +172,20 @@ func (A *simpleNfa) SetTransitionFunction(delta func(State, Letter) StateSet) {
 			}
 		}
 	}
+}
+
+func (A simpleNfa) Copy() Nfa {
+	B := NewNfa()
+	B.SetStates(A.States().Copy().(StateSet))
+	B.SetAlphabet(A.Alphabet().Copy().(set.Set))
+	B.SetInitialStates(A.InitialStates().Copy().(StateSet))
+	B.SetFinalStates(A.FinalStates().Copy().(StateSet))
+
+	for k, v := range A.transitions {
+		for l, w := range v {
+			B.SetTransition(k, l, w.Copy().(StateSet))
+		}
+	}
+
+	return B
 }
