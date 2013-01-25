@@ -17,25 +17,25 @@ func TestSimpleNfa(t *testing.T) {
 
 	a := nfa.Letter("a")
 	b := nfa.Letter("b")
-	s1 := nfa.State("1")
-	s2 := nfa.State("2")
-	s3 := nfa.State("3")
+	q0 := nfa.State("1")
+	q1 := nfa.State("2")
+	q2 := nfa.State("3")
 
 	A := nfa.NewNfa()
 
 	A.Alphabet().Add(a, b)
-	A.States().Add(s1, s2, s3)
-	A.InitialStates().Add(s1)
-	A.FinalStates().Add(s3)
+	A.States().Add(q0, q1, q2)
+	A.InitialStates().Add(q0)
+	A.FinalStates().Add(q2)
 
 	trans := func(s nfa.State, l nfa.Letter) nfa.StateSet {
 		S := set.NewSet()
-		if s.IsEqual(s1) && l.IsEqual(a) {
-			S.Add(s2)
-		} else if s.IsEqual(s2) && l.IsEqual(b) {
-			S.Add(s3)
-		} else if s.IsEqual(s3) && l.IsEqual(a) {
-			S.Add(s1)
+		if s.IsEqual(q0) && l.IsEqual(a) {
+			S.Add(q1)
+		} else if s.IsEqual(q1) && l.IsEqual(b) {
+			S.Add(q2)
+		} else if s.IsEqual(q2) && l.IsEqual(a) {
+			S.Add(q0)
 		}
 		return S
 	}
@@ -46,7 +46,7 @@ func TestSimpleNfa(t *testing.T) {
 		t.Error()
 	}
 
-	if A.Transition(s1, a).IsEqual(set.NewSet(s2)) != true || A.Transition(s2, b).IsEqual(set.NewSet(s3)) != true || A.Transition(s3, a).IsEqual(set.NewSet(s1)) != true || A.Transition(s1, b).IsEqual(set.NewSet()) != true {
+	if A.Transition(q0, a).IsEqual(set.NewSet(q1)) != true || A.Transition(q1, b).IsEqual(set.NewSet(q2)) != true || A.Transition(q2, a).IsEqual(set.NewSet(q0)) != true || A.Transition(q0, b).IsEqual(set.NewSet()) != true {
 		t.Error()
 	}
 }
