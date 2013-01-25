@@ -16,6 +16,10 @@ type Expression interface {
 
 /*****************************************************************************/
 
+func Concat(l, r Expression) Expression {
+	return concatExpression{l, r}
+}
+
 type concatExpression struct {
 	l, r Expression
 }
@@ -93,6 +97,10 @@ func (e concatExpression) Nfa() nfa.Nfa {
 	return A
 }
 
+func Letter(l string) Expression {
+	return letterExpression{l}
+}
+
 type letterExpression struct {
 	l string
 }
@@ -124,6 +132,10 @@ func (e letterExpression) Nfa() nfa.Nfa {
 	A.SetTransition(q0, l, set.NewSet(qf))
 
 	return A
+}
+
+func Or(l, r Expression) Expression {
+	return orExpression{l, r}
 }
 
 type orExpression struct {
@@ -180,6 +192,10 @@ func (e orExpression) Nfa() nfa.Nfa {
 	}
 
 	return A
+}
+
+func Star(e Expression) Expression {
+	return starExpression{e}
 }
 
 type starExpression struct {
@@ -255,24 +271,6 @@ func (e starExpression) Nfa() nfa.Nfa {
 	A.FinalStates().Add(q0)
 
 	return A
-}
-
-/*****************************************************************************/
-
-func Concat(l, r Expression) Expression {
-	return concatExpression{l, r}
-}
-
-func Letter(l string) Expression {
-	return letterExpression{l}
-}
-
-func Or(l, r Expression) Expression {
-	return orExpression{l, r}
-}
-
-func Star(e Expression) Expression {
-	return starExpression{e}
 }
 
 /*****************************************************************************/
