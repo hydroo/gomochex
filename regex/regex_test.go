@@ -1,7 +1,7 @@
 package regex_test
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/hydroo/gomochex/automaton/nfa"
 	"github.com/hydroo/gomochex/basic/set"
 	"github.com/hydroo/gomochex/regex"
@@ -11,12 +11,12 @@ import (
 func TestExpressionFromString(t *testing.T) {
 
 	//correct concatenation
-	if e, ok := regex.ExpressionFromString("(asdf.π)"); ok != true || fmt.Sprint(e) != "(asdf.π)" {
+	if e, ok := regex.ExpressionFromString("(asdf.π)"); ok != true || e.IsEqual(regex.Concat(regex.Letter("asdf"), regex.Letter("π"))) != true {
 		t.Error()
 	}
 
 	//correct letter
-	if e, ok := regex.ExpressionFromString("π"); ok != true || fmt.Sprint(e) != "π" {
+	if e, ok := regex.ExpressionFromString("π"); ok != true || e.IsEqual(regex.Letter("π")) != true {
 		t.Error()
 	}
 
@@ -26,12 +26,12 @@ func TestExpressionFromString(t *testing.T) {
 	}
 
 	//correct letter
-	if e, ok := regex.ExpressionFromString("πasdf"); ok != true || fmt.Sprint(e) != "πasdf" {
+	if e, ok := regex.ExpressionFromString("πasdf"); ok != true || e.IsEqual(regex.Letter("πasdf")) != true {
 		t.Error()
 	}
 
 	//correct or
-	if e, ok := regex.ExpressionFromString("(asdf+π)"); ok != true || fmt.Sprint(e) != "(asdf+π)" {
+	if e, ok := regex.ExpressionFromString("(asdf+π)"); ok != true || e.IsEqual(regex.Or(regex.Letter("asdf"), regex.Letter("π"))) != true {
 		t.Error()
 	}
 
@@ -41,7 +41,7 @@ func TestExpressionFromString(t *testing.T) {
 	}
 
 	//correct star
-	if e, ok := regex.ExpressionFromString("((asdf+π))*"); ok != true || fmt.Sprint(e) != "((asdf+π))*" {
+	if e, ok := regex.ExpressionFromString("((asdf+π))*"); ok != true || e.IsEqual(regex.Star(regex.Or(regex.Letter("asdf"), regex.Letter("π")))) != true {
 		t.Error()
 	}
 
@@ -51,7 +51,7 @@ func TestExpressionFromString(t *testing.T) {
 	}
 
 	//correct complex expr
-	if e, ok := regex.ExpressionFromString("(a.((π+b).(c)*))"); ok != true || fmt.Sprint(e) != "(a.((π+b).(c)*))" {
+	if e, ok := regex.ExpressionFromString("(a.((π+b).(c)*))"); ok != true || e.IsEqual(regex.Concat(regex.Letter("a"), regex.Concat(regex.Or(regex.Letter("π"), regex.Letter("b")), regex.Star(regex.Letter("c"))))) != true {
 		t.Error()
 	}
 
