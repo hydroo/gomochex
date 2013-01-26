@@ -1,8 +1,7 @@
-package nfa_test
+package nfa
 
 import (
 	//"fmt"
-	"github.com/hydroo/gomochex/automaton/nfa"
 	"github.com/hydroo/gomochex/basic/set"
 	"testing"
 )
@@ -15,20 +14,20 @@ import (
 //
 func TestSimpleNfa(t *testing.T) {
 
-	a := nfa.Letter("a")
-	b := nfa.Letter("b")
-	q0 := nfa.State("1")
-	q1 := nfa.State("2")
-	q2 := nfa.State("3")
+	a := Letter("a")
+	b := Letter("b")
+	q0 := State("1")
+	q1 := State("2")
+	q2 := State("3")
 
-	A := nfa.NewNfa()
+	A := NewNfa()
 
 	A.Alphabet().Add(a, b)
 	A.States().Add(q0, q1, q2)
 	A.InitialStates().Add(q0)
 	A.FinalStates().Add(q2)
 
-	trans := func(s nfa.State, l nfa.Letter) nfa.StateSet {
+	trans := func(s State, l Letter) StateSet {
 		S := set.NewSet()
 		if s.IsEqual(q0) && l.IsEqual(a) {
 			S.Add(q1)

@@ -1,57 +1,56 @@
-package regex_test
+package regex
 
 import (
 	//"fmt"
 	"github.com/hydroo/gomochex/automaton/nfa"
 	"github.com/hydroo/gomochex/basic/set"
-	"github.com/hydroo/gomochex/regex"
 	"testing"
 )
 
 func TestExpressionFromString(t *testing.T) {
 
 	//correct concatenation
-	if e, ok := regex.ExpressionFromString("(asdf.π)"); ok != true || e.IsEqual(regex.Concat(regex.Letter("asdf"), regex.Letter("π"))) != true {
+	if e, ok := ExpressionFromString("(asdf.π)"); ok != true || e.IsEqual(Concat(Letter("asdf"), Letter("π"))) != true {
 		t.Error()
 	}
 
 	//correct letter
-	if e, ok := regex.ExpressionFromString("π"); ok != true || e.IsEqual(regex.Letter("π")) != true {
+	if e, ok := ExpressionFromString("π"); ok != true || e.IsEqual(Letter("π")) != true {
 		t.Error()
 	}
 
 	//wrong letter
-	if _, ok := regex.ExpressionFromString("π."); ok != false {
+	if _, ok := ExpressionFromString("π."); ok != false {
 		t.Error()
 	}
 
 	//correct letter
-	if e, ok := regex.ExpressionFromString("πasdf"); ok != true || e.IsEqual(regex.Letter("πasdf")) != true {
+	if e, ok := ExpressionFromString("πasdf"); ok != true || e.IsEqual(Letter("πasdf")) != true {
 		t.Error()
 	}
 
 	//correct or
-	if e, ok := regex.ExpressionFromString("(asdf+π)"); ok != true || e.IsEqual(regex.Or(regex.Letter("asdf"), regex.Letter("π"))) != true {
+	if e, ok := ExpressionFromString("(asdf+π)"); ok != true || e.IsEqual(Or(Letter("asdf"), Letter("π"))) != true {
 		t.Error()
 	}
 
 	//wrong or
-	if _, ok := regex.ExpressionFromString("((asdf+π)"); ok != false {
+	if _, ok := ExpressionFromString("((asdf+π)"); ok != false {
 		t.Error()
 	}
 
 	//correct star
-	if e, ok := regex.ExpressionFromString("((asdf+π))*"); ok != true || e.IsEqual(regex.Star(regex.Or(regex.Letter("asdf"), regex.Letter("π")))) != true {
+	if e, ok := ExpressionFromString("((asdf+π))*"); ok != true || e.IsEqual(Star(Or(Letter("asdf"), Letter("π")))) != true {
 		t.Error()
 	}
 
 	//wrong star
-	if _, ok := regex.ExpressionFromString("π*"); ok != false {
+	if _, ok := ExpressionFromString("π*"); ok != false {
 		t.Error()
 	}
 
 	//correct complex expr
-	if e, ok := regex.ExpressionFromString("(a.((π+b).(c)*))"); ok != true || e.IsEqual(regex.Concat(regex.Letter("a"), regex.Concat(regex.Or(regex.Letter("π"), regex.Letter("b")), regex.Star(regex.Letter("c"))))) != true {
+	if e, ok := ExpressionFromString("(a.((π+b).(c)*))"); ok != true || e.IsEqual(Concat(Letter("a"), Concat(Or(Letter("π"), Letter("b")), Star(Letter("c"))))) != true {
 		t.Error()
 	}
 
@@ -62,7 +61,7 @@ func TestConcatNfa(t *testing.T) {
 	b := nfa.Letter("π")
 	c := nfa.Letter("c")
 
-	A := regex.Concat(regex.Letter("a"), regex.Or(regex.Letter("π"), regex.Letter("c"))).Nfa()
+	A := Concat(Letter("a"), Or(Letter("π"), Letter("c"))).Nfa()
 
 	if A.Alphabet().Size() != 3 || A.States().Size() < 5 || A.States().Size() > 6 || A.InitialStates().Size() != 1 || A.FinalStates().Size() != 2 {
 		t.Error()
@@ -129,7 +128,7 @@ func TestConcatNfa(t *testing.T) {
 func TestConcatNfa2(t *testing.T) {
 	a := nfa.Letter("a")
 
-	A := regex.Concat(regex.Letter("a"), regex.Letter("a")).Nfa()
+	A := Concat(Letter("a"), Letter("a")).Nfa()
 
 	if A.Alphabet().Size() != 1 || A.States().Size() < 3 || A.States().Size() > 4 || A.InitialStates().Size() != 1 || A.FinalStates().Size() != 1 {
 		t.Error()
@@ -167,7 +166,7 @@ func TestLetterNfa(t *testing.T) {
 
 	a := nfa.Letter("a")
 
-	A := regex.Letter("a").Nfa()
+	A := Letter("a").Nfa()
 
 	if A.Alphabet().Size() != 1 || A.States().Size() != 2 || A.InitialStates().Size() != 1 || A.FinalStates().Size() != 1 {
 		t.Error()
@@ -204,7 +203,7 @@ func TestOrNfa(t *testing.T) {
 	a := nfa.Letter("a")
 	b := nfa.Letter("π")
 
-	A := regex.Or(regex.Letter("a"), regex.Letter("π")).Nfa()
+	A := Or(Letter("a"), Letter("π")).Nfa()
 
 	if A.Alphabet().Size() != 2 || A.States().Size() != 4 || A.InitialStates().Size() != 2 || A.FinalStates().Size() != 2 {
 		t.Error()
@@ -259,7 +258,7 @@ func TestStarNfa(t *testing.T) {
 	a := nfa.Letter("a")
 	b := nfa.Letter("π")
 
-	A := regex.Star(regex.Or(regex.Concat(regex.Letter("a"), regex.Letter("a")), regex.Concat(regex.Letter("π"), regex.Letter("π")))).Nfa()
+	A := Star(Or(Concat(Letter("a"), Letter("a")), Concat(Letter("π"), Letter("π")))).Nfa()
 
 	// the maximal nfa has 9 states and a lot of transitions to useless states
 	//

@@ -1,14 +1,13 @@
-package set_test
+package set
 
 import (
 	//"fmt"
-	"github.com/hydroo/gomochex/basic/set"
 	"testing"
 )
 
 type myInt int
 
-func (i myInt) IsEqual(j set.Element) bool {
+func (i myInt) IsEqual(j Element) bool {
 
 	if k, ok := j.(myInt); ok == true && i == k {
 		return true
@@ -18,7 +17,7 @@ func (i myInt) IsEqual(j set.Element) bool {
 }
 
 func TestInit(t *testing.T) {
-	S := set.NewSet()
+	S := NewSet()
 
 	if S.Size() != 0 {
 		t.Error()
@@ -26,7 +25,7 @@ func TestInit(t *testing.T) {
 }
 
 func TestAdd(t *testing.T) {
-	S := set.NewSet()
+	S := NewSet()
 	S.Add(myInt(1), myInt(2), myInt(3))
 
 	if S.Size() != 3 {
@@ -42,7 +41,7 @@ func TestAdd(t *testing.T) {
 }
 
 func TestAddDuplicates(t *testing.T) {
-	S := set.NewSet()
+	S := NewSet()
 	S.Add(myInt(1))
 	S.Add(myInt(1))
 
@@ -54,9 +53,9 @@ func TestAddDuplicates(t *testing.T) {
 }
 
 func TestIsEqual(t *testing.T) {
-	S := set.NewSet(myInt(1), myInt(2))
+	S := NewSet(myInt(1), myInt(2))
 
-	T := set.NewSet(myInt(1), myInt(2))
+	T := NewSet(myInt(1), myInt(2))
 
 	if S.IsEqual(T) != true {
 		t.Error()
@@ -64,11 +63,11 @@ func TestIsEqual(t *testing.T) {
 }
 
 func TestIsUnequal(t *testing.T) {
-	S := set.NewSet(myInt(1), myInt(2))
+	S := NewSet(myInt(1), myInt(2))
 
-	T := set.NewSet(myInt(1), myInt(3))
+	T := NewSet(myInt(1), myInt(3))
 
-	U := set.NewSet(myInt(1))
+	U := NewSet(myInt(1))
 
 	V := myInt(1)
 
@@ -78,7 +77,7 @@ func TestIsUnequal(t *testing.T) {
 }
 
 func TestRemove(t *testing.T) {
-	S := set.NewSet(myInt(1), myInt(2), myInt(3))
+	S := NewSet(myInt(1), myInt(2), myInt(3))
 
 	S.Remove(myInt(2))
 
@@ -92,7 +91,7 @@ func TestRemove(t *testing.T) {
 }
 
 func TestRemoveFromEmpty(t *testing.T) {
-	S := set.NewSet()
+	S := NewSet()
 
 	S.Remove(myInt(1))
 
@@ -103,9 +102,9 @@ func TestRemoveFromEmpty(t *testing.T) {
 
 func TestIntersect(t *testing.T) {
 
-	S := set.NewSet(myInt(1), myInt(2), myInt(3))
-	T := set.NewSet(myInt(2), myInt(3), myInt(4))
-	U := set.Intersect(S, T)
+	S := NewSet(myInt(1), myInt(2), myInt(3))
+	T := NewSet(myInt(2), myInt(3), myInt(4))
+	U := Intersect(S, T)
 
 	u0, _ := U.At(0)
 	u1, _ := U.At(1)
@@ -116,9 +115,9 @@ func TestIntersect(t *testing.T) {
 
 func TestJoin(t *testing.T) {
 
-	S := set.NewSet(myInt(1), myInt(2), myInt(3))
-	T := set.NewSet(myInt(2), myInt(3), myInt(4))
-	U := set.Join(S, T)
+	S := NewSet(myInt(1), myInt(2), myInt(3))
+	T := NewSet(myInt(2), myInt(3), myInt(4))
+	U := Join(S, T)
 
 	u0, _ := U.At(0)
 	u1, _ := U.At(1)
