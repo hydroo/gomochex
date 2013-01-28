@@ -5,13 +5,6 @@ import (
 	"testing"
 )
 
-func TestCreateFormula(t *testing.T) {
-
-	if phi := Or(Not(And(Ap("π"), Not(Ap("prΘp")))), Ap("a")); fmt.Sprint(phi) != "(¬((π∧¬(prΘp)))∨a)" {
-		t.Error()
-	}
-}
-
 func TestFormulaFromString(t *testing.T) {
 
 	// correct formula
