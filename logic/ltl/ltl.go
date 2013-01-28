@@ -12,12 +12,20 @@ type Formula interface {
 
 /*****************************************************************************/
 
+func Always(phi Formula) Formula {
+	return alwaysFormula{phi}
+}
+
 type alwaysFormula struct {
 	phi Formula
 }
 
 func (n alwaysFormula) String() string {
 	return fmt.Sprint("□(", n.phi, ")")
+}
+
+func And(phi, psi Formula) Formula {
+	return andFormula{phi, psi}
 }
 
 type andFormula struct {
@@ -29,12 +37,20 @@ func (n andFormula) String() string {
 }
 
 // atomic proposition
+func Ap(a string) Formula {
+	return aPFormula{a}
+}
+
 type aPFormula struct {
 	a string
 }
 
 func (n aPFormula) String() string {
 	return n.a
+}
+
+func Eventually(phi Formula) Formula {
+	return eventuallyFormula{phi}
 }
 
 type eventuallyFormula struct {
@@ -45,11 +61,19 @@ func (n eventuallyFormula) String() string {
 	return fmt.Sprint("◇(", n.phi, ")")
 }
 
+func False() Formula {
+	return falseFormula{}
+}
+
 type falseFormula struct {
 }
 
 func (n falseFormula) String() string {
 	return "false"
+}
+
+func Next(phi Formula) Formula {
+	return nextFormula{phi}
 }
 
 type nextFormula struct {
@@ -60,12 +84,20 @@ func (n nextFormula) String() string {
 	return fmt.Sprint("○(", n.phi, ")")
 }
 
+func Not(phi Formula) Formula {
+	return notFormula{phi}
+}
+
 type notFormula struct {
 	phi Formula
 }
 
 func (n notFormula) String() string {
 	return fmt.Sprint("¬(", n.phi, ")")
+}
+
+func Or(phi, psi Formula) Formula {
+	return orFormula{phi, psi}
 }
 
 type orFormula struct {
@@ -76,11 +108,19 @@ func (n orFormula) String() string {
 	return fmt.Sprint("(", n.phi, "∨", n.psi, ")")
 }
 
+func True() Formula {
+	return trueFormula{}
+}
+
 type trueFormula struct {
 }
 
 func (n trueFormula) String() string {
 	return "true"
+}
+
+func Until(phi, psi Formula) Formula {
+	return untilFormula{phi, psi}
 }
 
 type untilFormula struct {
@@ -89,49 +129,6 @@ type untilFormula struct {
 
 func (n untilFormula) String() string {
 	return fmt.Sprint("((", n.phi, ")U(", n.psi, "))")
-}
-
-/*****************************************************************************/
-
-func Always(phi Formula) Formula {
-	return alwaysFormula{phi}
-}
-
-func And(phi, psi Formula) Formula {
-	return andFormula{phi, psi}
-}
-
-// atomic proposition
-func Ap(a string) Formula {
-	return aPFormula{a}
-}
-
-func Eventually(phi Formula) Formula {
-	return eventuallyFormula{phi}
-}
-
-func False() Formula {
-	return falseFormula{}
-}
-
-func Next(phi Formula) Formula {
-	return nextFormula{phi}
-}
-
-func Not(phi Formula) Formula {
-	return notFormula{phi}
-}
-
-func Or(phi, psi Formula) Formula {
-	return orFormula{phi, psi}
-}
-
-func True() Formula {
-	return trueFormula{}
-}
-
-func Until(phi, psi Formula) Formula {
-	return untilFormula{phi, psi}
 }
 
 /*****************************************************************************/
