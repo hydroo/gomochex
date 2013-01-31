@@ -60,11 +60,11 @@ func NewNfa() Nfa {
 /*****************************************************************************/
 
 type simpleNfa struct {
-	states        set.Set
+	states        StateSet
 	alphabet      set.Set
-	initialStates set.Set
+	initialStates StateSet
 	transitions   map[State]map[Letter]StateSet
-	finalStates   set.Set
+	finalStates   StateSet
 }
 
 func (A simpleNfa) Alphabet() Alphabet {
