@@ -1,6 +1,7 @@
 package nfa
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/hydroo/gomochex/basic/set"
 )
@@ -32,6 +33,9 @@ type Alphabet set.Set
 type StateSet set.Set
 
 type Nfa interface {
+	json.Marshaler
+	json.Unmarshaler
+
 	Alphabet() Alphabet
 	SetAlphabet(Alphabet)
 
@@ -117,6 +121,67 @@ func (A simpleNfa) String() string {
 	}
 
 	return ret
+}
+
+func (A simpleNfa) MarshalJSON() ([]byte, error) {
+	type simpleNfaWithExportedFields struct {
+		States        StateSet
+		Alphabet      set.Set
+		InitialStates StateSet
+		Transitions   map[State]map[Letter]StateSet
+		FinalStates   StateSet
+	}
+	return json.Marshal(simpleNfaWithExportedFields{A.states, A.alphabet, A.initialStates, A.transitions, A.finalStates})
+}
+
+func (A *simpleNfa) UnmarshalJSON(b []byte) error {
+	type simpleNfaForUnmarshaling struct {
+		States        []State
+		Alphabet      []Letter
+		InitialStates []State
+		Transitions   map[string]map[string][]string //using Letter or State won't work here
+		FinalStates   []State
+	}
+
+	var B simpleNfaForUnmarshaling
+	if err := json.Unmarshal(b, &B); err != nil {
+		return err
+	}
+
+	states := set.NewSet()
+	alphabet := set.NewSet()
+	initialStates := set.NewSet()
+	transitions := make(map[State]map[Letter]StateSet)
+	finalStates := set.NewSet()
+
+	for _, s := range B.States {
+		states.Add(s)
+	}
+	for _, l := range B.Alphabet {
+		alphabet.Add(l)
+	}
+	for _, s := range B.InitialStates {
+		initialStates.Add(s)
+	}
+	for _, s := range B.FinalStates {
+		finalStates.Add(s)
+	}
+	for k, v := range B.Transitions {
+		for l, w := range v {
+			if _, ok := transitions[State(k)]; ok != true {
+				transitions[State(k)] = make(map[Letter]StateSet)
+			}
+			S := set.NewSet()
+			for _, s := range w {
+				S.Add(State(s))
+			}
+			transitions[State(k)][Letter(l)] = S
+		}
+	}
+
+	*A = simpleNfa{states, alphabet, initialStates, transitions, finalStates}
+
+	return nil
 }
 
 func (A simpleNfa) Transition(s State, l Letter) StateSet {
