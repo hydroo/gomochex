@@ -229,7 +229,7 @@ func Union(A, B Nfa) Nfa {
 
 type simpleNfa struct {
 	states        StateSet
-	alphabet      set.Set
+	alphabet      Alphabet
 	initialStates StateSet
 	transitions   map[State]map[Letter]StateSet
 	finalStates   StateSet
@@ -290,7 +290,7 @@ func (A simpleNfa) String() string {
 func (A simpleNfa) MarshalJSON() ([]byte, error) {
 	type simpleNfaWithExportedFields struct {
 		States        StateSet
-		Alphabet      set.Set
+		Alphabet      Alphabet
 		InitialStates StateSet
 		Transitions   map[State]map[Letter]StateSet
 		FinalStates   StateSet
@@ -406,7 +406,7 @@ func (A *simpleNfa) SetTransitionFunction(delta func(State, Letter) StateSet) {
 func (A simpleNfa) Copy() Nfa {
 	B := NewNfa()
 	B.SetStates(A.States().Copy().(StateSet))
-	B.SetAlphabet(A.Alphabet().Copy().(set.Set))
+	B.SetAlphabet(A.Alphabet().Copy().(Alphabet))
 	B.SetInitialStates(A.InitialStates().Copy().(StateSet))
 	B.SetFinalStates(A.FinalStates().Copy().(StateSet))
 
