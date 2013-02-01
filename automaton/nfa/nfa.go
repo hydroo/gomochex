@@ -61,6 +61,170 @@ func NewNfa() Nfa {
 	return &simpleNfa{set.NewSet(), set.NewSet(), set.NewSet(), make(map[State]map[Letter]StateSet), set.NewSet()}
 }
 
+func Concat(A, B Nfa) Nfa {
+	C := NewNfa()
+
+	C.SetAlphabet(set.Join(A.Alphabet(), B.Alphabet()))
+
+	//add B as it is with a 1 prepended to all states
+	//add A as it is with a 0 prepended to all states
+	for k, T := range []Nfa{A, B} {
+		for i := 0; i < T.States().Size(); i += 1 {
+			s, _ := T.States().At(i)
+			s_ := State(fmt.Sprint(k, s))
+
+			C.States().Add(s_)
+
+			if k == 1 && T.FinalStates().Probe(s) == true { //B
+				C.FinalStates().Add(s_)
+			} else if k == 0 && T.InitialStates().Probe(s) == true { //A
+				C.InitialStates().Add(s_)
+			}
+
+			for j := 0; j < T.Alphabet().Size(); j += 1 {
+				a, _ := T.Alphabet().At(j)
+				S := T.Transition(s.(State), a.(Letter))
+
+				S_ := set.NewSet()
+				for l := 0; l < S.Size(); l += 1 {
+					t, _ := S.At(l)
+					S_.Add(State(fmt.Sprint(k, t)))
+				}
+
+				C.SetTransition(s_, a.(Letter), S_)
+			}
+		}
+	}
+
+	// add transititons from before final states in A to all initial states in B
+	S_ := set.NewSet()
+	for i := 0; i < B.InitialStates().Size(); i += 1 {
+		s, _ := B.InitialStates().At(i)
+		S_.Add(State(fmt.Sprint(1, s)))
+	}
+
+	for i := 0; i < A.States().Size(); i += 1 {
+		s, _ := A.States().At(i)
+		s_ := State(fmt.Sprint(0, s))
+
+		for j := 0; j < A.Alphabet().Size(); j += 1 {
+			a, _ := A.Alphabet().At(j)
+			S := A.Transition(s.(State), a.(Letter))
+
+			if set.Intersect(A.FinalStates(), S).Size() > 0 {
+				C.SetTransition(s_, a.(Letter), set.Join(A.Transition(s_, a.(Letter)), S_))
+			}
+		}
+	}
+
+	return C
+}
+
+func KleeneStar(A Nfa) Nfa {
+
+	var q0 State
+	for i := 0; ; i += 1 {
+		q0 = State(fmt.Sprint(i))
+		if A.States().Probe(q0) == false {
+			break
+		}
+	}
+
+	A.States().Add(q0)
+
+	// add transitions from before final states to the new initial state
+	for i := 0; i < A.States().Size(); i += 1 {
+		for j := 0; j < A.Alphabet().Size(); j += 1 {
+
+			q_, _ := A.States().At(i)
+			q := q_.(State)
+
+			a_, _ := A.Alphabet().At(j)
+			a := a_.(Letter)
+
+			Q := A.Transition(q, a)
+
+			if set.Intersect(Q, A.FinalStates()).Size() != 0 {
+				Q.Add(q0)
+				A.SetTransition(q, a, Q)
+			}
+		}
+	}
+
+	// add transitions from the new initial state
+	// to the destinations of the old initial states
+	for i := 0; i < A.InitialStates().Size(); i += 1 {
+		for j := 0; j < A.Alphabet().Size(); j += 1 {
+
+			q_, _ := A.InitialStates().At(i)
+			q := q_.(State)
+
+			a_, _ := A.Alphabet().At(j)
+			a := a_.(Letter)
+
+			Q := A.Transition(q, a)
+			Q0 := A.Transition(q0, a)
+
+			A.SetTransition(q0, a, set.Join(Q, Q0))
+		}
+	}
+
+	A.InitialStates().Clear()
+	A.InitialStates().Add(q0)
+	A.FinalStates().Clear()
+	A.FinalStates().Add(q0)
+
+	return A
+}
+
+func OneLetter(a Letter) Nfa {
+	A := NewNfa()
+	q0 := State("0")
+	qf := State("f")
+	A.Alphabet().Add(a)
+	A.States().Add(q0, qf)
+	A.InitialStates().Add(q0)
+	A.FinalStates().Add(qf)
+	A.SetTransition(q0, a, set.NewSet(qf))
+	return A
+}
+
+func Union(A, B Nfa) Nfa {
+	C := NewNfa()
+
+	C.SetAlphabet(set.Join(A.Alphabet(), B.Alphabet()))
+
+	for k, T := range []Nfa{A, B} {
+		for i := 0; i < T.States().Size(); i += 1 {
+			s, _ := T.States().At(i)
+			ss := State(fmt.Sprint(k, s))
+			C.States().Add(ss)
+
+			if T.InitialStates().Probe(s) == true {
+				C.InitialStates().Add(ss)
+			}
+			if T.FinalStates().Probe(s) == true {
+				C.FinalStates().Add(ss)
+			}
+
+			for j := 0; j < T.Alphabet().Size(); j += 1 {
+				a, _ := T.Alphabet().At(j)
+
+				S := T.Transition(s.(State), a.(Letter))
+				SS := set.NewSet()
+				for l := 0; l < S.Size(); l += 1 {
+					t, _ := S.At(l)
+					SS.Add(State(fmt.Sprint(k, t)))
+				}
+
+				C.SetTransition(ss, a.(Letter), SS)
+			}
+		}
+	}
+
+	return C
+}
+
 /*****************************************************************************/
 
 type simpleNfa struct {
