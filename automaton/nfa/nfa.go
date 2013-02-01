@@ -33,9 +33,6 @@ type Alphabet set.Set
 type StateSet set.Set
 
 type Nfa interface {
-	json.Marshaler
-	json.Unmarshaler
-
 	Alphabet() Alphabet
 	SetAlphabet(Alphabet)
 
@@ -48,13 +45,15 @@ type Nfa interface {
 	States() StateSet
 	SetStates(StateSet)
 
-	String() string
-
 	Transition(State, Letter) StateSet
 	SetTransition(State, Letter, StateSet)
 	SetTransitionFunction(func(State, Letter) StateSet)
 
 	Copy() Nfa
+
+	String() string
+	json.Marshaler
+	json.Unmarshaler
 }
 
 func NewNfa() Nfa {
