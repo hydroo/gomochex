@@ -363,6 +363,49 @@ func TestJson(t *testing.T) {
 	}
 }
 
+func TestInducedNfa(t *testing.T) {
+	// -> o -> o -> □
+	//    |    ^    |
+	//    |    +----
+	//    |
+	//    + -> □
+	s := []byte(`{"States":["0","1","2","3"],"Alphabet":["a"],"InitialStates":["0"],"Transitions":{"0":{"a":["1","3"]},"1":{"a":["2"]},"2":{"a":["1"]}},"FinalStates":["2","3"]}`)
+	u := []byte(`{"States":["0","1","2","3"],"Alphabet":["a"],"InitialStates":["0","1"],"Transitions":{"0":{"a":["1","3"]},"1":{"a":["2"]},"2":{"a":["1"]}},"FinalStates":["2","3"]}`)
+	v := []byte(`{"States":["1","2"],"Alphabet":["a"],"InitialStates":["1"],"Transitions":{"1":{"a":["2"]},"2":{"a":["1"]}},"FinalStates":["2"]}`)
+	w := []byte(`{"States":["3"],"Alphabet":["a"],"InitialStates":["3"],"Transitions":{},"FinalStates":["3"]}`)
+	x := []byte(`{"States":["1","2","3"],"Alphabet":["a"],"InitialStates":["1","3"],"Transitions":{"1":{"a":["2"]},"2":{"a":["1"]}},"FinalStates":["2","3"]}`)
+	y := []byte(`{"States":["2","1"],"Alphabet":["a"],"InitialStates":["2"],"Transitions":{"1":{"a":["2"]},"2":{"a":["1"]}},"FinalStates":["2"]}`)
+
+	A := NewNfa()
+	json.Unmarshal(s, &A)
+
+	s_, err0 := json.Marshal(A.InducedNfa(set.NewSet(State("0"))))
+	u_, err1 := json.Marshal(A.InducedNfa(set.NewSet(State("0"), State("1"))))
+	v_, err2 := json.Marshal(A.InducedNfa(set.NewSet(State("1"))))
+	w_, err3 := json.Marshal(A.InducedNfa(set.NewSet(State("3"))))
+	x_, err4 := json.Marshal(A.InducedNfa(set.NewSet(State("1"), State("3"))))
+	y_, err5 := json.Marshal(A.InducedNfa(set.NewSet(State("2"))))
+
+	if err0 != nil || bytes.Compare(s, s_) != 0 {
+		t.Error()
+	}
+	if err1 != nil || bytes.Compare(u, u_) != 0 {
+		t.Error()
+	}
+	if err2 != nil || bytes.Compare(v, v_) != 0 {
+		t.Error()
+	}
+	if err3 != nil || bytes.Compare(w, w_) != 0 {
+		t.Error()
+	}
+	if err4 != nil || bytes.Compare(x, x_) != 0 {
+		t.Error()
+	}
+	if err5 != nil || bytes.Compare(y, y_) != 0 {
+		t.Error()
+	}
+}
+
 func TestRemoveUselessParts(t *testing.T) {
 	//    o
 	//    |

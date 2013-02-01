@@ -51,6 +51,8 @@ type Nfa interface {
 
 	Copy() Nfa
 
+	InducedNfa(StateSet) Nfa
+
 	String() string
 	json.Marshaler
 	json.Unmarshaler
@@ -414,6 +416,44 @@ func (A simpleNfa) Copy() Nfa {
 			B.SetTransition(k, l, w.Copy().(StateSet))
 		}
 	}
+
+	return B
+}
+
+// Q will be the new initial states
+func (A simpleNfa) InducedNfa(Q StateSet) Nfa {
+	B := NewNfa().(*simpleNfa)
+	B.initialStates = Q
+	B.alphabet = A.Alphabet()
+
+	var recurse func(State)
+	recurse = func(q State) {
+		if B.States().Probe(q) == true {
+			return
+		}
+
+		B.States().Add(q)
+
+		if B.transitions[q] == nil && len(A.transitions[q]) > 0 {
+			B.transitions[q] = make(map[Letter]StateSet)
+		}
+
+		for l, w := range A.transitions[q] {
+			B.transitions[q][l] = w.Copy().(StateSet)
+
+			for i := 0; i < w.Size(); i += 1 {
+				r, _ := w.At(i)
+				recurse(r.(State))
+			}
+		}
+	}
+
+	for i := 0; i < Q.Size(); i += 1 {
+		q, _ := Q.At(i)
+		recurse(q.(State))
+	}
+
+	B.finalStates = set.Intersect(A.FinalStates(), B.States())
 
 	return B
 }
