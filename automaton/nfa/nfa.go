@@ -418,3 +418,83 @@ func (A simpleNfa) Copy() Nfa {
 
 	return B
 }
+
+func (A simpleNfa) reachableStates() StateSet {
+	reached := set.NewSet()
+
+	var recurse func(State)
+	recurse = func(q State) {
+		if reached.Probe(q) == true {
+			return
+		}
+
+		reached.Add(q)
+
+		for i := 0; i < A.Alphabet().Size(); i += 1 {
+			a, _ := A.Alphabet().At(i)
+			Q := A.Transition(q, a.(Letter))
+
+			for j := 0; j < Q.Size(); j += 1 {
+				q_, _ := Q.At(j)
+				recurse(q_.(State))
+			}
+		}
+	}
+
+	for i := 0; i < A.InitialStates().Size(); i += 1 {
+		q, _ := A.InitialStates().At(i)
+		recurse(q.(State))
+	}
+
+	return reached
+}
+
+// states and transitions from which no final state is reachable
+// states and transitions that are unreachable
+func (A simpleNfa) removeUselessParts() Nfa {
+	reachableStates := A.reachableStates()
+
+	nonEmptyLanguageStates := set.NewSet()
+
+	var recurse func(State)
+	recurse = func(u State) {
+		if nonEmptyLanguageStates.Probe(u) == true {
+			return
+		}
+		nonEmptyLanguageStates.Add(u)
+		for k, v := range A.transitions { //map[State]map[Letter]StateSet
+			for _, w := range v {
+				if set.Intersect(set.NewSet(u), w).Size() > 0 {
+					recurse(k)
+				}
+			}
+		}
+	}
+
+	//backward search for all states that can reach a reachable final state
+	reachableFinalStates := set.Intersect(reachableStates, A.FinalStates())
+	for i := 0; i < reachableFinalStates.Size(); i += 1 {
+		q, _ := reachableFinalStates.At(i)
+		recurse(q.(State))
+	}
+
+	usefulStates := set.Intersect(reachableFinalStates, nonEmptyLanguageStates)
+
+	B := NewNfa().(*simpleNfa)
+
+	B.states = usefulStates
+	B.initialStates = set.Intersect(A.InitialStates(), usefulStates)
+	B.finalStates = set.Intersect(A.InitialStates(), usefulStates)
+
+	for k, v := range A.transitions {
+		for l, w := range v {
+			usefulGoalStates := set.Intersect(usefulStates, w)
+			if usefulStates.Probe(k) == true && usefulGoalStates.Size() > 0 {
+				B.alphabet.Add(l)
+				B.SetTransition(k, l, usefulGoalStates)
+			}
+		}
+	}
+
+	return B
+}

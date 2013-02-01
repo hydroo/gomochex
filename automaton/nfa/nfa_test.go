@@ -363,3 +363,28 @@ func TestJson(t *testing.T) {
 	}
 }
 
+func TestRemoveUselessParts(t *testing.T) {
+	//    o
+	//    |
+	//    v
+	// -> □ -> o
+	//
+	//    o -> □
+	//
+	// -> o -> o
+	s := []byte(`{
+		"States":["0","1","2","3","4","5","6"],
+		"Alphabet":["a"],
+		"InitialStates":["0","4"],
+		"Transitions":{"0":{"a":["1"]},"2":{"a":["3"]},"4":{"a":["5"]},"6":{"a":["0"]}},
+		"FinalStates":["0","3"]
+	}`)
+	u := []byte(`{"States":["0"],"Alphabet":[],"InitialStates":["0"],"Transitions":{},"FinalStates":["0"]}`)
+	A := NewNfa().(*simpleNfa)
+	json.Unmarshal(s, &A)
+
+	v, err := json.Marshal(A.removeUselessParts())
+	if err != nil || bytes.Compare(u, v) != 0 {
+		t.Error()
+	}
+}
