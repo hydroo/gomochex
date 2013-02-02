@@ -15,30 +15,27 @@ import (
 //     +--------- a ----------+
 //
 func TestSimpleNfa(t *testing.T) {
-
 	a := Letter("a")
 	b := Letter("b")
-	q0 := State("1")
-	q1 := State("2")
-	q2 := State("3")
+	q0 := State("0")
+	q1 := State("1")
+	q2 := State("2")
 
 	A := NewNfa()
-
 	A.Alphabet().Add(a, b)
 	A.States().Add(q0, q1, q2)
 	A.InitialStates().Add(q0)
 	A.FinalStates().Add(q2)
 
 	trans := func(s State, l Letter) StateSet {
-		S := set.NewSet()
 		if s.IsEqual(q0) && l.IsEqual(a) {
-			S.Add(q1)
+			return set.NewSet(q1)
 		} else if s.IsEqual(q1) && l.IsEqual(b) {
-			S.Add(q2)
+			return set.NewSet(q2)
 		} else if s.IsEqual(q2) && l.IsEqual(a) {
-			S.Add(q0)
+			return set.NewSet(q0)
 		}
-		return S
+		return set.NewSet()
 	}
 
 	A.SetTransitionFunction(trans)
@@ -405,8 +402,9 @@ func TestIsEqual(t *testing.T) {
 		json.Unmarshal(x.A, &A)
 		B := NewNfa()
 		json.Unmarshal(x.B, &B)
+
 		if A.IsEqual(B) != x.result {
-			t.Error(fmt.Sprint("case ", k, " should be ", x.result, "\nA:", string(x.B), "\nB:", string(x.B)))
+			t.Error("case ", k, " should be ", x.result, "\nA:", string(x.A), "\nB:", string(x.B))
 		}
 	}
 }

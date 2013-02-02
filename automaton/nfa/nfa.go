@@ -487,6 +487,9 @@ func (A simpleNfa) Transition(s State, l Letter) StateSet {
 }
 
 func (A *simpleNfa) SetTransition(s State, l Letter, S StateSet) {
+	if S.Size() == 0 {
+		return
+	}
 
 	var m map[Letter]StateSet
 	if _, ok := A.transitions[s]; ok == false {
