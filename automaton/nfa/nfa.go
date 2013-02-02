@@ -55,6 +55,7 @@ type Nfa interface {
 	String() string
 	json.Marshaler
 	json.Unmarshaler
+	IsEqual(Nfa) bool
 }
 
 func NewNfa() Nfa {
@@ -346,6 +347,117 @@ func (A *simpleNfa) UnmarshalJSON(b []byte) error {
 	*A = simpleNfa{states, alphabet, initialStates, transitions, finalStates}
 
 	return nil
+}
+
+func (A simpleNfa) IsEqual(B Nfa) bool {
+
+	var transitionCount func(simpleNfa) int
+	transitionCount = func(A simpleNfa) int {
+		ret := 0
+		for _, v := range A.transitions {
+			for _, w := range v {
+				ret += w.Size()
+			}
+		}
+		return ret
+	}
+
+	C := B.(*simpleNfa)
+
+	if A.States().Size() != C.States().Size() || A.InitialStates().Size() != C.InitialStates().Size() || A.FinalStates().Size() != C.FinalStates().Size() || A.Alphabet().IsEqual(C.Alphabet()) != true || transitionCount(A) != transitionCount(*C) {
+		return false
+	}
+
+	var incomingEdgesCount func(simpleNfa, State, Letter) int
+	incomingEdgesCount = func(C simpleNfa, q State, l Letter) int {
+		ret := 0
+		for _, v := range C.transitions {
+			for l_, w := range v {
+				if l_ == l && w.Probe(q) == true {
+					ret += 1
+				}
+			}
+		}
+		return ret
+	}
+
+	var outgoingEdgesCount func(simpleNfa, State, Letter) int
+	outgoingEdgesCount = func(C simpleNfa, q State, l Letter) int {
+		ret := 0
+		for l_, w := range C.transitions[q] {
+			if l_ == l {
+				ret += w.Size()
+			}
+		}
+		return ret
+	}
+
+	permutations := make([]map[State]State, 0)
+
+	var generatePermutations func(int, StateSet, map[State]State)
+	generatePermutations = func(i int, U StateSet, m map[State]State) {
+		if U.Size() == 0 {
+			permutations = append(permutations, m)
+			return
+		}
+
+		q_, _ := A.States().At(i)
+		q := q_.(State)
+
+		for j := 0; j < U.Size(); j += 1 {
+			u_, _ := U.At(j)
+			u := u_.(State)
+
+			for k := 0; k < A.Alphabet().Size(); k += 1 {
+				l_, _ := A.Alphabet().At(k)
+				l := l_.(Letter)
+
+				if incomingEdgesCount(A, q, l) != incomingEdgesCount(*C, u, l) || outgoingEdgesCount(A, q, l) != outgoingEdgesCount(*C, u, l) {
+					continue
+				}
+			}
+
+			U_ := U.Copy().(StateSet)
+			U_.Remove(u)
+			m_ := make(map[State]State)
+			for k, v := range m {
+				m_[k] = v
+			}
+			m_[q] = u
+			generatePermutations(i+1, U_, m_)
+		}
+	}
+
+	generatePermutations(0, C.States(), make(map[State]State))
+
+	for _, identify := range permutations {
+		correct := true
+		for k, v := range A.transitions {
+			for l, w := range v {
+
+				k_ := identify[k]
+				l_ := l
+				w_ := set.NewSet()
+
+				for i := 0; i < w.Size(); i += 1 {
+					q, _ := w.At(i)
+					w_.Add(identify[q.(State)])
+				}
+
+				if B.Transition(k_, l_).IsEqual(w_) != true {
+					correct = false
+					break
+				}
+			}
+			if correct == false {
+				break
+			}
+		}
+		if correct == true {
+			return true
+		}
+	}
+	return false
 }
 
 func (A simpleNfa) Transition(s State, l Letter) StateSet {

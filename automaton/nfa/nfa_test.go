@@ -3,7 +3,7 @@ package nfa
 import (
 	"bytes"
 	"encoding/json"
-	//"fmt"
+	"fmt"
 	"github.com/hydroo/gomochex/basic/set"
 	"testing"
 )
@@ -360,6 +360,50 @@ func TestJson(t *testing.T) {
 
 	if bytes.Compare(s1, s3) != 0 {
 		t.Error()
+	}
+}
+
+func TestIsEqual(t *testing.T) {
+	type test struct {
+		A, B   []byte
+		result bool
+	}
+
+	tests := []test{
+		test{
+			[]byte(`{"States":["0","1"],"Alphabet":["a"],"InitialStates":["0","1"],"Transitions":{"0":{"a":["0"]},"1":{"a":["1"]}},"FinalStates":["0","1"]}`),
+			[]byte(`{"States":["1","0"],"Alphabet":["a"],"InitialStates":["1","0"],"Transitions":{"1":{"a":["1"]},"0":{"a":["0"]}},"FinalStates":["0","1"]}`),
+			true},
+		test{
+			[]byte(`{"States":["0","1"],"Alphabet":["a"],"InitialStates":["0","1"],"Transitions":{"0":{"a":["0"]},"1":{"a":["1"]}},"FinalStates":["0","1"]}`),
+			[]byte(`{"States":["x","y"],"Alphabet":["a"],"InitialStates":["x","y"],"Transitions":{"x":{"a":["x"]},"y":{"a":["y"]}},"FinalStates":["x","y"]}`),
+			true},
+		test{
+			[]byte(`{"States":["0","1"],"Alphabet":["a"],"InitialStates":["0","1"],"Transitions":{"0":{"a":["0"]},"1":{"a":["1"]}},"FinalStates":["0","1"]}`),
+			[]byte(`{"States":["0","1","2"],"Alphabet":["a"],"InitialStates":["0","1"],"Transitions":{"0":{"a":["0"]},"1":{"a":["1"]}},"FinalStates":["0","1"]}`),
+			false},
+		test{
+			[]byte(`{"States":["0","1"],"Alphabet":["a"],"InitialStates":["0","1"],"Transitions":{"0":{"a":["0"]},"1":{"a":["1"]}},"FinalStates":["0","1"]}`),
+			[]byte(`{"States":["0","2"],"Alphabet":["a"],"InitialStates":["0","1"],"Transitions":{"0":{"a":["0"]},"1":{"a":["1"]}},"FinalStates":["0","1"]}`),
+			false},
+		test{
+			[]byte(`{"States":["0"],"Alphabet":["a"],"InitialStates":["0"],"Transitions":{},"FinalStates":["0"]}`),
+			[]byte(`{"States":["0"],"Alphabet":["a"],"InitialStates":["0"],"Transitions":{"0":{"a":["0"]}},"FinalStates":["0"]}`),
+			false},
+		test{
+			[]byte(`{"States":["0"],"Alphabet":["a","b"],"InitialStates":["0"],"Transitions":{"0":{"a":["0"]}},"FinalStates":["0"]}`),
+			[]byte(`{"States":["0"],"Alphabet":["a","b"],"InitialStates":["0"],"Transitions":{"0":{"b":["0"]}},"FinalStates":["0"]}`),
+			false},
+	}
+
+	for k, x := range tests {
+		A := NewNfa()
+		json.Unmarshal(x.A, &A)
+		B := NewNfa()
+		json.Unmarshal(x.B, &B)
+		if A.IsEqual(B) != x.result {
+			t.Error(fmt.Sprint("case ", k, " should be ", x.result, "\nA:", string(x.B), "\nB:", string(x.B)))
+		}
 	}
 }
 
