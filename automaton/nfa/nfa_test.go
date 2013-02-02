@@ -189,29 +189,29 @@ func TestInducedNfa(t *testing.T) {
 	//    |
 	//    + -> □
 	s := []byte(`{"States":["0","1","2","3"],"Alphabet":["a"],"InitialStates":["0"],"Transitions":{"0":{"a":["1","3"]},"1":{"a":["2"]},"2":{"a":["1"]}},"FinalStates":["2","3"]}`)
-	u := []byte(`{"States":["1","2"],"Alphabet":["a"],"InitialStates":["1"],"Transitions":{"1":{"a":["2"]},"2":{"a":["1"]}},"FinalStates":["2"]}`)
-	v := []byte(`{"States":["3"],"Alphabet":["a"],"InitialStates":["3"],"Transitions":{},"FinalStates":["3"]}`)
-	w := []byte(`{"States":["2","1"],"Alphabet":["a"],"InitialStates":["2"],"Transitions":{"1":{"a":["2"]},"2":{"a":["1"]}},"FinalStates":["2"]}`)
 
 	A := NewNfa().(*simpleNfa)
 	json.Unmarshal(s, &A)
 
-	s_, err0 := json.Marshal(A.inducedNfa(State("0")))
-	u_, err1 := json.Marshal(A.inducedNfa(State("1")))
-	v_, err2 := json.Marshal(A.inducedNfa(State("3")))
-	w_, err3 := json.Marshal(A.inducedNfa(State("2")))
+	results := make([]struct {
+		should, is []byte
+		err        error
+	}, 4)
 
-	if err0 != nil || bytes.Compare(s, s_) != 0 {
-		t.Error()
-	}
-	if err1 != nil || bytes.Compare(u, u_) != 0 {
-		t.Error()
-	}
-	if err2 != nil || bytes.Compare(v, v_) != 0 {
-		t.Error()
-	}
-	if err3 != nil || bytes.Compare(w, w_) != 0 {
-		t.Error()
+	results[0].is, results[0].err = json.Marshal(A.inducedNfa(State("0")))
+	results[1].is, results[1].err = json.Marshal(A.inducedNfa(State("1")))
+	results[2].is, results[2].err = json.Marshal(A.inducedNfa(State("3")))
+	results[3].is, results[3].err = json.Marshal(A.inducedNfa(State("2")))
+
+	results[0].should = s
+	results[1].should = []byte(`{"States":["1","2"],"Alphabet":["a"],"InitialStates":["1"],"Transitions":{"1":{"a":["2"]},"2":{"a":["1"]}},"FinalStates":["2"]}`)
+	results[2].should = []byte(`{"States":["3"],"Alphabet":["a"],"InitialStates":["3"],"Transitions":{},"FinalStates":["3"]}`)
+	results[3].should = []byte(`{"States":["2","1"],"Alphabet":["a"],"InitialStates":["2"],"Transitions":{"1":{"a":["2"]},"2":{"a":["1"]}},"FinalStates":["2"]}`)
+
+	for k, r := range results {
+		if r.err != nil || bytes.Compare(r.is, r.should) != 0 {
+			t.Error("case ", k, "\nshould:", string(r.should), "\nis:    ", string(r.is))
+		}
 	}
 }
 
