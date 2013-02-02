@@ -394,6 +394,10 @@ func TestIsEqual(t *testing.T) {
 			[]byte(`{"States":["0"],"Alphabet":["a","b"],"InitialStates":["0"],"Transitions":{"0":{"a":["0"]}},"FinalStates":["0"]}`),
 			[]byte(`{"States":["0"],"Alphabet":["a","b"],"InitialStates":["0"],"Transitions":{"0":{"b":["0"]}},"FinalStates":["0"]}`),
 			false},
+		test{
+			[]byte(`{"States":["0","1","2","3"],"Alphabet":["a","π"],"InitialStates":["0","2"],"Transitions":{"0":{"a":["1"]},"2":{"π":["3"]}},"FinalStates":["1","3"]}`),
+			[]byte(`{"States":["0","1","2","3"],"Alphabet":["a","π"],"InitialStates":["0","1"],"Transitions":{"0":{"a":["1"]},"2":{"π":["3"]}},"FinalStates":["1","3"]}`),
+			false},
 	}
 
 	for k, x := range tests {

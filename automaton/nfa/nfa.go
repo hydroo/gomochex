@@ -430,21 +430,28 @@ func (A simpleNfa) IsEqual(B Nfa) bool {
 
 	generatePermutations(0, C.States(), make(map[State]State))
 
+	var translateSet func(StateSet, map[State]State) StateSet
+	translateSet = func(Q StateSet, m map[State]State) StateSet {
+		U := set.NewSet()
+		for i := 0; i < Q.Size(); i += 1 {
+			q, _ := Q.At(i)
+			U.Add(m[q.(State)])
+		}
+		return U
+	}
+
 	for _, identify := range permutations {
+
+		//check initial and final states
+		if B.InitialStates().IsEqual(translateSet(A.InitialStates(), identify)) != true || B.FinalStates().IsEqual(translateSet(A.FinalStates(), identify)) != true {
+			continue
+		}
+
+		//check transitions
 		correct := true
 		for k, v := range A.transitions {
 			for l, w := range v {
-
-				k_ := identify[k]
-				l_ := l
-				w_ := set.NewSet()
-
-				for i := 0; i < w.Size(); i += 1 {
-					q, _ := w.At(i)
-					w_.Add(identify[q.(State)])
-				}
-
-				if B.Transition(k_, l_).IsEqual(w_) != true {
+				if B.Transition(identify[k], l).IsEqual(translateSet(w, identify)) != true {
 					correct = false
 					break
 				}
