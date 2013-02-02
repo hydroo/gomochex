@@ -37,235 +37,58 @@ func TestSimpleNfa(t *testing.T) {
 		}
 		return set.NewSet()
 	}
-
 	A.SetTransitionFunction(trans)
 
-	if A.Alphabet().Size() != 2 || A.States().Size() != 3 || A.InitialStates().Size() != 1 || A.FinalStates().Size() != 1 {
-		t.Error()
-	}
-
-	if A.Transition(q0, a).IsEqual(set.NewSet(q1)) != true || A.Transition(q1, b).IsEqual(set.NewSet(q2)) != true || A.Transition(q2, a).IsEqual(set.NewSet(q0)) != true || A.Transition(q0, b).IsEqual(set.NewSet()) != true {
-		t.Error()
-	}
+	s := []byte(`{"States":["0","1","2"],"Alphabet":["a","b"],"InitialStates":["0"],"Transitions":{"0":{"a":["1"]},"1":{"b":["2"]},"2":{"a":["0"]}},"FinalStates":["2"]}`)
+	compareNfaToMarshaledNfa(A, s, true, t, "")
 }
 
 func TestConcat(t *testing.T) {
-	a := Letter("a")
-	b := Letter("π")
-	c := Letter("c")
-	A := Concat(OneLetter(a), Union(OneLetter(b), OneLetter(c)))
-
-	if A.Alphabet().Size() != 3 || A.States().Size() < 5 || A.States().Size() > 6 || A.InitialStates().Size() != 1 || A.FinalStates().Size() != 2 {
-		t.Error()
-	}
-	if A.Alphabet().Probe(a) != true || A.Alphabet().Probe(b) != true || A.Alphabet().Probe(c) != true {
-		t.Error()
-	}
+	A := Concat(OneLetter("a"), Union(OneLetter("π"), OneLetter("c"))).(*simpleNfa).removeUselessParts()
 
 	//       -- a --> o -- π --> □
 	//      /
 	// --> o
 	//      \
 	//       -- a --> o -- c --> □
-	transitionCount := 0
-	var lastLetter set.Element = nil //makes sure no two π or c transitions occur
-	visitedRStates := set.NewSet()   //makes sure the two π and c transitions use entirely different states
-	for i := 0; i < A.States().Size(); i += 1 {
-		s, _ := A.States().At(i)
-		for j := 0; j < A.Alphabet().Size(); j += 1 {
-			x, _ := A.Alphabet().At(j)
-			S := A.Transition(s.(State), x.(Letter))
-
-			if S.Size() == 0 {
-				continue
-			}
-			if S.Size() == 2 { // init -- a --> 2x
-				u, _ := S.At(0)
-				v, _ := S.At(1)
-				if A.InitialStates().Probe(s) != true || A.InitialStates().Probe(u) != false || A.InitialStates().Probe(v) != false || A.FinalStates().Probe(s) != false || A.FinalStates().Probe(u) != false || A.FinalStates().Probe(v) != false || x.IsEqual(a) != true {
-					t.Error()
-				}
-			} else if S.Size() == 1 { // o -- c --> □ or o -- π --> □
-				u, _ := S.At(0)
-
-				if x.IsEqual(b) == false && x.IsEqual(c) == false {
-					t.Error()
-				}
-
-				if A.InitialStates().Probe(s) != false || A.FinalStates().Probe(s) != false || A.InitialStates().Probe(u) != false || A.FinalStates().Probe(u) != true {
-					t.Error()
-				}
-
-				// do not visit c two times, or π two times
-				if lastLetter == nil {
-					lastLetter = x
-				} else {
-					if lastLetter.IsEqual(x) != false {
-						t.Error()
-					}
-				}
-
-				visitedRStates.Add(s, u)
-			}
-
-			transitionCount += 1
-		}
-	}
-
-	if transitionCount != 3 || visitedRStates.Size() != 4 {
-		t.Error()
-	}
+	s := []byte(`{"States":["0","1","2","3","4"],"Alphabet":["a","π","c"],"InitialStates":["0"],"Transitions":{"0":{"a":["1","3"]},"1":{"π":["2"]},"3":{"c":["4"]}},"FinalStates":["2","4"]}`)
+	compareNfaToMarshaledNfa(A, s, true, t, "")
 }
 
 func TestConcatNfa2(t *testing.T) {
 	a := Letter("a")
-	A := Concat(OneLetter(a), OneLetter(a))
+	A := Concat(OneLetter(a), OneLetter(a)).(*simpleNfa).removeUselessParts()
 
-	if A.Alphabet().Size() != 1 || A.States().Size() < 3 || A.States().Size() > 4 || A.InitialStates().Size() != 1 || A.FinalStates().Size() != 1 {
-		t.Error()
-	}
-	if A.Alphabet().Probe(a) != true {
-		t.Error()
-	}
-
-	q0_, _ := A.InitialStates().At(0)
-	q0 := q0_.(State)
-
-	Q0 := A.Transition(q0, a)
-	if Q0.Size() < 1 || Q0.Size() > 2 {
-		t.Error()
-	}
-
-	q1_, _ := Q0.At(0)
-	q1 := q1_.(State)
-	if A.Transition(q1, a).Size() == 0 {
-		q1_, _ = Q0.At(1)
-		q1 = q1_.(State)
-	}
-
-	Q1 := A.Transition(q1, a)
-	if Q1.Size() != 1 {
-		t.Error()
-	}
-
-	if set.Intersect(Q1, A.FinalStates()).Size() != 1 {
-		t.Error()
-	}
+	s := []byte(`{"States":["0","1","2"],"Alphabet":["a"],"InitialStates":["0"],"Transitions":{"0":{"a":["1"]},"1":{"a":["2"]}},"FinalStates":["2"]}`)
+	compareNfaToMarshaledNfa(A, s, true, t, "")
 }
 
 func TestKleeneStar(t *testing.T) {
 	a := Letter("a")
 	b := Letter("π")
-	A := KleeneStar(Union(Concat(OneLetter(a), OneLetter(a)), Concat(OneLetter(b), OneLetter(b))))
+	A := KleeneStar(Union(Concat(OneLetter(a), OneLetter(a)), Concat(OneLetter(b), OneLetter(b)))).(*simpleNfa).removeUselessParts()
 
-	// the maximal nfa has 9 states and a lot of transitions to useless states
-	//
 	// minimal nfa:
 	//
-	// +-- a ---
-	// |        \
-	// | - a -> o
-	// v/
-	// □
-	// ^\
-	// | - π -> o
-	// |       /
-	// +-- π --
-
-	if A.Alphabet().Size() != 2 || A.States().Size() < 3 || A.States().Size() > 9 || A.InitialStates().Size() != 1 || A.FinalStates().Size() != 1 {
-		t.Error()
-	}
-	if A.Alphabet().Probe(a) != true || A.Alphabet().Probe(b) != true {
-		t.Error()
-	}
-	if A.InitialStates().IsEqual(A.FinalStates()) != true {
-		t.Error()
-	}
-
-	q0_, _ := A.InitialStates().At(0)
-	q0 := q0_.(State)
-
-	if A.Transition(q0, a).Size() < 1 || A.Transition(q0, a).Size() > 2 || A.Transition(q0, b).Size() < 1 || A.Transition(q0, b).Size() > 2 {
-		t.Error()
-	}
-
-	q1_, _ := A.Transition(q0, a).At(0)
-	q1 := q1_.(State)
-	if A.Transition(q1, a).Size() == 0 {
-		q1_, _ = A.Transition(q0, a).At(1)
-		q1 = q1_.(State)
-	}
-
-	q2_, _ := A.Transition(q0, b).At(0)
-	q2 := q2_.(State)
-	if A.Transition(q2, b).Size() == 0 {
-		q2_, _ = A.Transition(q0, b).At(1)
-		q2 = q2_.(State)
-	}
-
-	if A.Transition(q1, a).Size() < 1 || A.Transition(q1, a).Size() > 3 || A.Transition(q2, b).Size() < 1 || A.Transition(q2, b).Size() > 3 {
-		t.Error()
-	}
-
-	Q1 := A.Transition(q1, a)
-	Q2 := A.Transition(q2, b)
-
-	if Q1.Probe(q0) == false || Q2.Probe(q0) == false {
-		t.Error()
-	}
-
-	var q10, q20 State
-
-	if q, _ := Q1.At(0); q.IsEqual(q0) {
-		q10_, _ := Q1.At(1)
-		q10 = q10_.(State)
-	} else {
-		q10_, _ := Q1.At(0)
-		q10 = q10_.(State)
-	}
-	if q, _ := Q2.At(0); q.IsEqual(q0) {
-		q20_, _ := Q2.At(1)
-		q20 = q20_.(State)
-	} else {
-		q20_, _ := Q2.At(0)
-		q20 = q20_.(State)
-	}
-
-	if A.Transition(q10, a).Size() != 0 || A.Transition(q10, b).Size() != 0 || A.Transition(q20, a).Size() != 0 || A.Transition(q20, b).Size() != 0 {
-		t.Error()
-	}
+	//   +-- a ---
+	//   |        \
+	//   | - a -> o
+	//   v/
+	// ->□
+	//   ^\
+	//   | - π -> o
+	//   |       /
+	//   +-- π --
+	s := []byte(`{"States":["0","1","2"],"Alphabet":["a","π"],"InitialStates":["0"],"Transitions":{"0":{"a":["1"],"π":["2"]},"1":{"a":["0"]},"2":{"π":["0"]}},"FinalStates":["0"]}`)
+	compareNfaToMarshaledNfa(A, s, true, t, "")
 }
 
 func TestOneLetter(t *testing.T) {
 	a := Letter("π")
 	A := OneLetter(a)
 
-	if A.Alphabet().Size() != 1 || A.Alphabet().Probe(a) != true || A.States().Size() != 2 || A.InitialStates().Size() != 1 || A.FinalStates().Size() != 1 {
-		t.Error()
-	}
-
-	//has exactly one transition which is not a loop,
-	//and goes from an initial to a final state
-	for i := 0; i < A.States().Size(); i += 1 {
-		s, _ := A.States().At(i)
-		for j := 0; j < A.Alphabet().Size(); j += 1 {
-			x, _ := A.Alphabet().At(j)
-			S := A.Transition(s.(State), x.(Letter))
-
-			if S.Size() == 0 {
-				continue
-			}
-			if S.Size() != 1 {
-				t.Error()
-			}
-
-			u, _ := S.At(0)
-
-			if s.IsEqual(u) || A.InitialStates().Probe(s) != true || A.FinalStates().Probe(s) != false || A.FinalStates().Probe(u) != true || A.InitialStates().Probe(u) != false {
-				t.Error()
-			}
-		}
-	}
+	s := []byte(`{"States":["0","1"],"Alphabet":["π"],"InitialStates":["0"],"Transitions":{"0":{"π":["1"]}},"FinalStates":["1"]}`)
+	compareNfaToMarshaledNfa(A, s, true, t, "")
 }
 
 func TestUnion(t *testing.T) {
@@ -273,52 +96,9 @@ func TestUnion(t *testing.T) {
 	b := Letter("π")
 	A := Union(OneLetter(a), OneLetter(b))
 
-	if A.Alphabet().Size() != 2 || A.States().Size() != 4 || A.InitialStates().Size() != 2 || A.FinalStates().Size() != 2 {
-		t.Error()
-	}
-	if A.Alphabet().Probe(a) != true || A.Alphabet().Probe(b) != true {
-		t.Error()
-	}
+	s := []byte(`{"States":["0","1","2","3"],"Alphabet":["a","π"],"InitialStates":["0","2"],"Transitions":{"0":{"a":["1"]},"2":{"π":["3"]}},"FinalStates":["1","3"]}`)
 
-	//has exactly two transitions which are not loops,
-	//both go from an initial to a final state,
-	//and use two different letters
-	transitionCount := 0
-	var lastLetter set.Element
-	for i := 0; i < A.States().Size(); i += 1 {
-		s, _ := A.States().At(i)
-		for j := 0; j < A.Alphabet().Size(); j += 1 {
-			x, _ := A.Alphabet().At(j)
-			S := A.Transition(s.(State), x.(Letter))
-
-			if S.Size() == 0 {
-				continue
-			}
-			if S.Size() != 1 {
-				t.Error()
-			}
-
-			u, _ := S.At(0)
-
-			if s.IsEqual(u) || A.InitialStates().Probe(s) != true || A.FinalStates().Probe(s) != false || A.FinalStates().Probe(u) != true || A.InitialStates().Probe(u) != false {
-				t.Error()
-			}
-
-			if transitionCount == 0 {
-				lastLetter = x
-			} else if transitionCount == 1 {
-				if lastLetter.IsEqual(x) {
-					t.Error()
-				}
-			}
-
-			transitionCount += 1
-		}
-	}
-
-	if transitionCount != 2 {
-		t.Error()
-	}
+	compareNfaToMarshaledNfa(A, s, true, t, "")
 }
 
 func TestJson(t *testing.T) {
@@ -362,8 +142,8 @@ func TestJson(t *testing.T) {
 
 func TestIsEqual(t *testing.T) {
 	type test struct {
-		A, B   []byte
-		result bool
+		s, u          []byte
+		shouldBeEqual bool
 	}
 
 	tests := []test{
@@ -398,14 +178,7 @@ func TestIsEqual(t *testing.T) {
 	}
 
 	for k, x := range tests {
-		A := NewNfa()
-		json.Unmarshal(x.A, &A)
-		B := NewNfa()
-		json.Unmarshal(x.B, &B)
-
-		if A.IsEqual(B) != x.result {
-			t.Error("case ", k, " should be ", x.result, "\nA:", string(x.A), "\nB:", string(x.B))
-		}
+		compareMarshaledNfaToMarshaledNfa(x.s, x.u, x.shouldBeEqual, t, fmt.Sprint("case ", k))
 	}
 }
 
@@ -461,11 +234,27 @@ func TestRemoveUselessParts(t *testing.T) {
 		"FinalStates":["0","3","8"]
 	}`)
 	u := []byte(`{"States":["0","7","8"],"Alphabet":["a"],"InitialStates":["0","7"],"Transitions":{"7":{"a":["8"]}},"FinalStates":["0","8"]}`)
+
 	A := NewNfa().(*simpleNfa)
 	json.Unmarshal(s, &A)
+	B := A.removeUselessParts()
+	compareNfaToMarshaledNfa(B, u, true, t, "")
+}
 
-	v, err := json.Marshal(A.removeUselessParts())
-	if err != nil || bytes.Compare(u, v) != 0 {
-		t.Error(fmt.Sprint("\nshould:", string(u), "\nis:    ", string(v)))
+func compareMarshaledNfaToMarshaledNfa(s, u []byte, shouldBeEqual bool, t *testing.T, extraInfo string) {
+	A := NewNfa()
+	json.Unmarshal(s, &A)
+	compareNfaToMarshaledNfa(A, u, shouldBeEqual, t, extraInfo)
+}
+
+func compareNfaToMarshaledNfa(A Nfa, s []byte, shouldBeEqual bool, t *testing.T, extraInfo string) {
+	B := NewNfa()
+	json.Unmarshal(s, &B)
+	if A.IsEqual(B) != shouldBeEqual {
+		u, _ := json.Marshal(A)
+		if extraInfo != "" {
+			extraInfo = fmt.Sprint("\n", extraInfo)
+		}
+		t.Error(extraInfo, "\nshould be equal: ", shouldBeEqual, " \nshould:", string(s), "\nis:    ", string(u))
 	}
 }
