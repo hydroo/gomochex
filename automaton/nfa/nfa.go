@@ -625,13 +625,13 @@ func (A simpleNfa) removeUselessParts() Nfa {
 		recurse(q.(State))
 	}
 
-	usefulStates := set.Intersect(reachableFinalStates, nonEmptyLanguageStates)
+	usefulStates := set.Intersect(reachableStates, nonEmptyLanguageStates)
 
 	B := NewNfa().(*simpleNfa)
 
 	B.states = usefulStates
 	B.initialStates = set.Intersect(A.InitialStates(), usefulStates)
-	B.finalStates = set.Intersect(A.InitialStates(), usefulStates)
+	B.finalStates = set.Intersect(A.FinalStates(), usefulStates)
 
 	for k, v := range A.transitions {
 		for l, w := range v {

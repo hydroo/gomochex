@@ -449,19 +449,21 @@ func TestRemoveUselessParts(t *testing.T) {
 	//    o -> □
 	//
 	// -> o -> o
+	//
+	// -> o -> □
 	s := []byte(`{
-		"States":["0","1","2","3","4","5","6"],
+		"States":["0","1","2","3","4","5","6","7","8"],
 		"Alphabet":["a"],
-		"InitialStates":["0","4"],
-		"Transitions":{"0":{"a":["1"]},"2":{"a":["3"]},"4":{"a":["5"]},"6":{"a":["0"]}},
-		"FinalStates":["0","3"]
+		"InitialStates":["0","4","7"],
+		"Transitions":{"0":{"a":["1"]},"2":{"a":["3"]},"4":{"a":["5"]},"6":{"a":["0"]},"7":{"a":["8"]}},
+		"FinalStates":["0","3","8"]
 	}`)
-	u := []byte(`{"States":["0"],"Alphabet":[],"InitialStates":["0"],"Transitions":{},"FinalStates":["0"]}`)
+	u := []byte(`{"States":["0","7","8"],"Alphabet":["a"],"InitialStates":["0","7"],"Transitions":{"7":{"a":["8"]}},"FinalStates":["0","8"]}`)
 	A := NewNfa().(*simpleNfa)
 	json.Unmarshal(s, &A)
 
 	v, err := json.Marshal(A.removeUselessParts())
 	if err != nil || bytes.Compare(u, v) != 0 {
-		t.Error()
+		t.Error(fmt.Sprint("\nshould:", string(u), "\nis:    ", string(v)))
 	}
 }
